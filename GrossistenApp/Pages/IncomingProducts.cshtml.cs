@@ -1,18 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using GrossistenApp.Models;
-using Microsoft.EntityFrameworkCore;
-using GrossistenApp.Data;
 using GrossistenApp.ViewModels;
+using GrossistenApp.Service;
 
 namespace GrossistenApp.Pages
 {
     public class IncomingProductsModel : PageModel
     {
-        private readonly GrossistenAppDatabaseContext _context;
-        public IncomingProductsModel(GrossistenAppDatabaseContext context)
+        private readonly CallApiService _callApiService;
+        public IncomingProductsModel(CallApiService callApiService)
         {
-            _context = context;
+            _callApiService = callApiService;
         }
         [BindProperty]
         public Product ProductObject { get; set; }
@@ -28,8 +27,8 @@ namespace GrossistenApp.Pages
 
         public async Task OnGetAsync()
         {
-            ProductsFromDbList = await _context.ProductsTable.ToListAsync();
-            ReceiptsFromDbList = await _context.ReceiptsTable.ToListAsync();
+            ProductsFromDbList = await _callApiService.GetDataFromApi<List<Product>>("Product");
+            ReceiptsFromDbList = await _callApiService.GetDataFromApi<List<Receipt>>("Receipt");
 
         }
 
@@ -41,8 +40,7 @@ namespace GrossistenApp.Pages
             ProductObject.ShowInAvailableToPurchase = true;
             ProductObject.ShowInStock = false;
             ProductObject.ShowOnReceipt = false;
-            _context.ProductsTable.Add(ProductObject);
-            await _context.SaveChangesAsync();
+            await _callApiService.CreateItem("Product", ProductObject);
             return RedirectToPage("./IncomingProducts");
         }
 
@@ -50,7 +48,7 @@ namespace GrossistenApp.Pages
         public async Task<IActionResult> OnPostAddToStockAsync()
         {
 
-            var allProductsFromDb = await _context.ProductsTable.ToListAsync();
+            var allProductsFromDb = await _callApiService.GetDataFromApi<List<Product>>("Product");
 
             //----Öka antal från Beställningsbara Produkter formuläret på befintlig produkt------
             foreach (var inputObject in ProductsToAddFromInput)
@@ -70,19 +68,18 @@ namespace GrossistenApp.Pages
                 }
             }
 
-           await _context.SaveChangesAsync();
+           await _callApiService.EditItem("Product/bulk", allProductsFromDb);
 
             //-------Create Receipt---------------
             ReceiptObject.WorkerName = "Svenne";
             ReceiptObject.showAsIncomingReceipt = true;
             ReceiptObject.showAsOutgoingReceipt = false;
             ReceiptObject.DateAndTimeCreated = DateTime.Now;
-            _context.ReceiptsTable.Add(ReceiptObject);
 
-            await _context.SaveChangesAsync();
+            await _callApiService.CreateItem("Receipt", ReceiptObject);
 
             //Lägg till dom ökade Produkterna till kvittot
-            int highestReceiptIdInDb = _context.ReceiptsTable.Max(x => x.Id);
+            int highestReceiptIdInDb = _callApiService.GetDataFromApi<List<Receipt>>("Receipt").Result.Max(r => r.Id);
             foreach (var inputObject in ProductsToAddFromInput)
             {
 
@@ -104,8 +101,7 @@ namespace GrossistenApp.Pages
                     ProductObject.ShowInAvailableToPurchase = false;
                     ProductObject.ShowInStock = false;
                     ProductObject.ShowOnReceipt = true;
-                    _context.ProductsTable.Add(ProductObject);
-                    await _context.SaveChangesAsync();
+                    await _callApiService.CreateItem("Product", ProductObject); 
                 }
             }
 

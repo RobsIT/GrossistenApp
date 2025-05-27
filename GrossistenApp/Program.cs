@@ -1,5 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using GrossistenApp.Data;
+using GrossistenApp.Service;
 
 namespace GrossistenApp
 {
@@ -9,12 +8,15 @@ namespace GrossistenApp
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Konfigurera DbContext med anslutningssträngen
-            builder.Services.AddDbContext<GrossistenAppDatabaseContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddHttpClient("MyCallApiService", client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:7240/api/");
+            }
+);
 
             // Add services to the container.
             builder.Services.AddRazorPages();
+            builder.Services.AddScoped<CallApiService>();
 
             var app = builder.Build();
 

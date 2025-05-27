@@ -1,18 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using GrossistenApp.Models;
-using Microsoft.EntityFrameworkCore;
-using GrossistenApp.Data;
 using GrossistenApp.ViewModels;
+using GrossistenApp.Service;
 
 namespace GrossistenApp.Pages
 {
     public class OutgoingProductsModel : PageModel
     {
-        private readonly GrossistenAppDatabaseContext _context;
-        public OutgoingProductsModel(GrossistenAppDatabaseContext context)
+        private readonly CallApiService _callApiService;
+        public OutgoingProductsModel(CallApiService callApiService)
         {
-            _context = context;
+            _callApiService = callApiService;
         }
         [BindProperty]
         public Product ProductObject { get; set; }
@@ -20,6 +19,8 @@ namespace GrossistenApp.Pages
         public List<Product> ProductsFromDbList { get; set; }
         [BindProperty]
         public List<ProductInputViewModel> ProductsToAddFromInput { get; set; }
+        [BindProperty]
+        public Dictionary<int, int> ProductQuantitiesToAdd { get; set; } = new Dictionary<int, int>();
 
         public List<Receipt> ReceiptsFromDbList { get; set; }
         [BindProperty]
@@ -28,70 +29,73 @@ namespace GrossistenApp.Pages
 
         public async Task OnGetAsync()
         {
-            ProductsFromDbList = await _context.ProductsTable.ToListAsync();
-            ReceiptsFromDbList = await _context.ReceiptsTable.ToListAsync();
+            ProductsFromDbList = await _callApiService.GetDataFromApi<List<Product>>("Product");
+            ReceiptsFromDbList = await _callApiService.GetDataFromApi<List<Receipt>>("Receipt");
 
         }
 
-        public async Task<IActionResult> OnPostTakeFromStockAsync()
+        public async Task<IActionResult> OnPostAddToStockAsync()
         {
+            var allProductsFromDb = await _callApiService.GetDataFromApi<List<Product>>("Product");
 
-            var allProductsFromDb = await _context.ProductsTable.ToListAsync();
-
-            //----Öka antal från Leveransbara Produkter formuläret på befintlig produkt------
-
-            foreach (var inputObject in ProductsToAddFromInput)
+            // Update quantities for products that have additions
+            foreach (var product in ProductQuantitiesToAdd.Where(x => x.Value > 0))
             {
-                if (inputObject.QuantityToAdd > 0)
+                var productId = product.Key;
+                var quantityToAdd = product.Value;
+
+                var specificProduct = allProductsFromDb.FirstOrDefault(p => p.Id == productId);
+                if (specificProduct != null)
                 {
-                    var specificProduct = allProductsFromDb.FirstOrDefault(p => p.Id == inputObject.ProductId);
-                    if (specificProduct != null)
-                    {
-                        // ?? 0 betyder att om product.Quantity är null, så används värdet 0 istället.
-                        //Den returnerar vänstra sidan om den inte är null, annars returnerar den högra sidan.
-                        specificProduct.Quantity = (specificProduct.Quantity ?? 0) - inputObject.QuantityToAdd;
-
-                    }
-
+                    specificProduct.Quantity = (specificProduct.Quantity ?? 0) - quantityToAdd;
                 }
             }
 
-            await _context.SaveChangesAsync();
+            // Update products in bulk
+            var toUpdate = allProductsFromDb
+                .Where(p => ProductQuantitiesToAdd.ContainsKey(p.Id) && ProductQuantitiesToAdd[p.Id] > 0)
+                .ToList();
 
-            //-------Create Receipt---------------
+            if (toUpdate.Any())
+            {
+                await _callApiService.EditItem("Product/bulk", toUpdate);
+            }
+
+            // Create Receipt
             ReceiptObject.WorkerName = "Svenne";
             ReceiptObject.showAsIncomingReceipt = false;
             ReceiptObject.showAsOutgoingReceipt = true;
             ReceiptObject.DateAndTimeCreated = DateTime.Now;
-            _context.ReceiptsTable.Add(ReceiptObject);
 
-            await _context.SaveChangesAsync();
+            await _callApiService.CreateItem("Receipt", ReceiptObject);
 
-            //Lägg till dom ökade Produkterna till kvittot
-            int highestReceiptIdInDb = _context.ReceiptsTable.Max(x => x.Id);
-            foreach (var inputObject in ProductsToAddFromInput)
+            // Add products to receipt
+            var receipts = await _callApiService.GetDataFromApi<List<Receipt>>("Receipt");
+            int highestReceiptIdInDb = receipts.Max(r => r.Id);
+
+            foreach (var product in ProductQuantitiesToAdd.Where(x => x.Value > 0))
             {
+                var productId = product.Key;
+                var quantityToAdd = product.Value;
 
-                if (inputObject.QuantityToAdd > 0)
+                var choosenProductToAdd = allProductsFromDb.FirstOrDefault(p => p.Id == productId);
+
+                if (choosenProductToAdd != null)
                 {
-
-                    //Hämtar produkten som motsvarar Id:t i ProductsToAddFromInput-listan.
-                    var choosenProductToAdd = allProductsFromDb.FirstOrDefault(p => p.Id == inputObject.ProductId);
-
-                    ProductObject.Id = 0;//VIKTIGT med 0 för att databasen ska hantera Id.
+                    ProductObject.Id = 0;
                     ProductObject.ArticleNumber = choosenProductToAdd.ArticleNumber;
                     ProductObject.Title = choosenProductToAdd.Title;
                     ProductObject.Description = choosenProductToAdd.Description;
                     ProductObject.Size = choosenProductToAdd.Size;
                     ProductObject.Price = choosenProductToAdd.Price;
                     ProductObject.Category = choosenProductToAdd.Category;
-                    ProductObject.Quantity = inputObject.QuantityToAdd;
+                    ProductObject.Quantity = quantityToAdd;
                     ProductObject.ReceiptId = highestReceiptIdInDb;
                     ProductObject.ShowInAvailableToPurchase = false;
                     ProductObject.ShowInStock = false;
                     ProductObject.ShowOnReceipt = true;
-                    _context.ProductsTable.Add(ProductObject);
-                    await _context.SaveChangesAsync();
+
+                    await _callApiService.CreateItem("Product", ProductObject);
                 }
             }
 

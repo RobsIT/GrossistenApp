@@ -1,17 +1,18 @@
-using GrossistenApp.Data;
+
 using GrossistenApp.Models;
+using GrossistenApp.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace GrossistenApp.Pages
 {
     public class SpecificProductDetailsModel : PageModel
     {
-        private readonly GrossistenAppDatabaseContext _context;
-        public SpecificProductDetailsModel(GrossistenAppDatabaseContext context)
+        private readonly CallApiService _callApiService;
+        public SpecificProductDetailsModel(CallApiService callApiService)
         {
-            _context = context;
+            _callApiService = callApiService;
         }
         
         public Product SpecificProductDetails { get; set; }
@@ -23,7 +24,7 @@ namespace GrossistenApp.Pages
         public async Task OnGetAsync(int id)
         {
             
-            SpecificProductDetails = await _context.ProductsTable.FirstOrDefaultAsync(p => p.Id == id);
+            SpecificProductDetails = await _callApiService.GetDataFromApi<Product>($"Product/{id}");    
             UpdateSpecificProductDetails = SpecificProductDetails;
             DeleteSpecificProductObject = SpecificProductDetails;
         }
@@ -31,7 +32,7 @@ namespace GrossistenApp.Pages
         public async Task<IActionResult> OnPostUpdateAsync()
         {
 
-            var productToUpdate = await _context.ProductsTable.FindAsync(UpdateSpecificProductDetails.Id);
+            var productToUpdate = await _callApiService.GetDataFromApi<Product>($"Product/{UpdateSpecificProductDetails.Id}");
             if (productToUpdate == null)
             {
                 return NotFound();
@@ -46,21 +47,20 @@ namespace GrossistenApp.Pages
             productToUpdate.Category = UpdateSpecificProductDetails.Category;
             productToUpdate.Quantity = UpdateSpecificProductDetails.Quantity;
 
-          
-            await _context.SaveChangesAsync();
+
+            await _callApiService.EditItem($"Product/{productToUpdate.Id}", productToUpdate);
             // Påminner om vilken SpecificProductDetails man är på efter uppdateringen  new { id = UpdateSpecificProductDetails.Id }
             return RedirectToPage("./SpecificProductDetails", new { id = UpdateSpecificProductDetails.Id });
         }
 
         public async Task<IActionResult> OnPostDeleteAsync()
         {
-            var productToDelete = await _context.ProductsTable.FindAsync(DeleteSpecificProductObject.Id);
+            var productToDelete = await _callApiService.GetDataFromApi<Product>($"Product/{DeleteSpecificProductObject.Id}");
 
             if (productToDelete == null)
                 return NotFound();
 
-            _context.ProductsTable.Remove(productToDelete);
-            await _context.SaveChangesAsync();
+            await _callApiService.DeleteItem($"Product/{DeleteSpecificProductObject.Id}");
 
             return RedirectToPage("/StockOverview");
         }

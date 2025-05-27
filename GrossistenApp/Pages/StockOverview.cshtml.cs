@@ -1,5 +1,5 @@
-using GrossistenApp.Data;
 using GrossistenApp.Models;
+using GrossistenApp.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -8,10 +8,10 @@ namespace GrossistenApp.Pages
 {
     public class StockOverviewModel : PageModel
     {
-        private readonly GrossistenAppDatabaseContext _context;
-        public StockOverviewModel(GrossistenAppDatabaseContext context)
+        private readonly CallApiService _callApiService;
+        public StockOverviewModel(CallApiService callApiService)
         {
-            _context = context;
+            _callApiService = callApiService;
         }
         [BindProperty]
         public Product ProductObject { get; set; }
@@ -20,9 +20,7 @@ namespace GrossistenApp.Pages
 
         public async Task OnGetAsync()
         {
-            ProductsFromDbList = await _context.ProductsTable
-                .Where(p => p.ShowInStock == true)
-                .ToListAsync();
+            ProductsFromDbList = await _callApiService.GetDataFromApi<List<Product>>("Product");
         }
     }
 }
