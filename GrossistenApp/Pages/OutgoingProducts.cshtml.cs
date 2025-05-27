@@ -29,17 +29,18 @@ namespace GrossistenApp.Pages
 
         public async Task OnGetAsync()
         {
-            var AllProductsFromDbList = await _callApiService.GetDataFromApi<List<Product>>("Product");
-            OutgoingProductsFromDbList = AllProductsFromDbList.Where(p => p.ShowInStock ?? false).ToList();
-            ProductsFromDbListOnReceipt = AllProductsFromDbList.Where(p => p.ShowOnReceipt ?? false).ToList();
-            var AllReceiptsFromDbList = await _callApiService.GetDataFromApi<List<Receipt>>("Receipt");
-            OutgoingReceiptsFromDbList = AllReceiptsFromDbList.Where(r => r.showAsOutgoingReceipt ?? false).ToList();
+            var allProductsFromDbList = await _callApiService.GetDataFromApi<List<Product>>("Product");
+            OutgoingProductsFromDbList = allProductsFromDbList.Where(p => p.ShowInStock ?? false).ToList();
+            ProductsFromDbListOnReceipt = allProductsFromDbList.Where(p => p.ShowOnReceipt ?? false).ToList();
+
+            var allReceiptsFromDbList = await _callApiService.GetDataFromApi<List<Receipt>>("Receipt");
+            OutgoingReceiptsFromDbList = allReceiptsFromDbList.Where(r => r.showAsOutgoingReceipt ?? false).ToList();
         }
 
         public async Task<IActionResult> OnPostTakeFromStockAsync()
         {
             var allProductsFromDb = await _callApiService.GetDataFromApi<List<Product>>("Product");
-            var ListOfProductsChanged = new List<Product>();
+            var productsAddedToCount = new List<Product>();
             // Update quantities for products that have additions
 
             foreach (var product in ProductsToAddFromInput)
@@ -49,14 +50,14 @@ namespace GrossistenApp.Pages
                 if (product.QuantityToAdd > 0 && product.QuantityToAdd <= specificProduct.Quantity && specificProduct != null)
                 {
                     specificProduct.Quantity = (specificProduct.Quantity ?? 0) - product.QuantityToAdd;
-                    ListOfProductsChanged.Add(specificProduct);
+                    productsAddedToCount.Add(specificProduct);
                 }
             }
 
-            if (ListOfProductsChanged.Count > 0)
+            if (productsAddedToCount.Count > 0)
             {
                 // Update products in bulk
-                await _callApiService.EditItem("Product/bulk", ListOfProductsChanged);
+                await _callApiService.EditItem("Product/bulk", productsAddedToCount);
 
                 // Create Receipt
                 ReceiptObject.WorkerName = "Svenne";
