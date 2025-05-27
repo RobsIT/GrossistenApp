@@ -1,0 +1,53 @@
+﻿@page
+@model GrossistenApp.Pages.StockOverviewModel
+@{
+    ViewData["Title"] = "Lageröversikt";
+    var totalProductsQuantity = Model.ProductsFromDbList;
+}
+
+<div class="bigCard">
+    <h2>Lageröversikt</h2>
+    <div class="d-flex justify-content-between align-content-center">
+        <input type="text" id="searchInput" placeholder="Sök" class="form-control w-25" />
+        <strong style="padding-right: 20px;">Totalt antal: @totalProductsQuantity.Count </strong>
+    </div>
+    <div class="orderableProductsTable">
+
+        <table id="productsTable" >
+            <thead >
+                <tr>
+                    <th data-column="ArticleNumber" data-label="Artikelnummer">Artikelnummer</th>
+                    <th data-column="Title" data-label="Titel">Titel</th>
+                    <th data-column="Description" data-label="Beskrivning">Beskrivning</th>
+                    <th data-column="Size" data-label="Storlek">Storlek</th>
+                    <th data-column="Price" data-label="Pris">Pris</th>
+                    <th data-column="Category" data-label="Kategori">Kategori</th>
+                    <th data-column="Quantity" data-label="Antal">Antal</th>
+                </tr>
+            </thead>
+            <tbody id="productsBody" class="orderableProductsTable">
+                @foreach (var product in Model.ProductsFromDbList)
+                {
+                    // data-product-id ger varje rad ett id.
+                    // När man klickar på raden skickar JS-koden id till OnGet id-inparameter.
+                    <tr>
+                        <td data-product-id="@product.Id">@product.ArticleNumber</td>
+                        <td data-product-id="@product.Id">@product.Title</td>
+                        <td data-product-id="@product.Id">@product.Description.Substring(0,15)</td>
+                        <td data-product-id="@product.Id">@product.Size</td>
+                        <td data-product-id="@product.Id">@product.Price?.ToString("F2")</td>
+                        <td data-product-id="@product.Id">@product.Category</td>
+                        <td data-product-id="@product.Id">@product.Quantity</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div id="paginationButtons"></div>
+</div>
+
+<script src="~/js/StockOverviewTable.js"></script>
+
+
+

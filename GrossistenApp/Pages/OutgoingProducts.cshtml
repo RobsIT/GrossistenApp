@@ -1,0 +1,124 @@
+﻿@page
+@model GrossistenApp.Pages.OutgoingProductsModel
+@{
+    ViewData["Title"] = "Utleverans";
+}
+
+@* ------------- LEVERANSBARA PRODUKTER ------------------------------------*@
+<div class="bigCard">
+
+    <h2>Leveransbara Produkter</h2>
+    <p>Välj antal på vilka produkter som ska läggas till på lagret.</p>
+
+    <input type="text" id="searchInput" placeholder="Sök" class="form-control w-25" />
+
+    <div class="orderableProductsTable">
+
+        <form method="post" asp-page-handler="TakeFromStock">
+            <table id="productsTable">
+                <thead>
+                    <tr>
+                        <th data-column="ArticleNumber">Artikelnummer</th>
+                        <th data-column="Title">Titel</th>
+                        <th data-column="Description">Beskrivning</th>
+                        <th data-column="Size">Storlek</th>
+                        <th data-column="Price">Pris</th>
+                        <th data-column="Category">Kategori</th>
+                        <th data-column="Quantity">Antal i lager</th>
+                        <th>Lägg till antal</th>
+                    </tr>
+                </thead>
+                <tbody id="productsBody" class="orderableProductsTable">
+                    @for (int i = 0; i < Model.ProductsFromDbList.Count; i++)
+                    {
+                        var product = Model.ProductsFromDbList[i];
+
+                        //FIXA SORTERING I BACKEND!!!!!!!!!!!!!!!!!!!!!!!!!
+                        if (true)
+                        {
+                            // data-product-id ger varje cell ett id.
+                            // När man klickar på en cell skickar JS-koden id till OnGet id-inparameter.
+                            // Vi vill inte ha på Quantity för då hoppar vi in på specific-sidan när man ökar i inputen.
+                            <tr>
+                                <td data-product-id="@product.Id">@product.ArticleNumber</td>
+                                <td data-product-id="@product.Id">@product.Title</td>
+                                <td data-product-id="@product.Id">@product.Description</td>
+                                <td data-product-id="@product.Id">@product.Size</td>
+                                <td data-product-id="@product.Id">@product.Price kr</td>
+                                <td data-product-id="@product.Id">@product.Category</td>
+                                @*  ?? 0 betyder att om p.Quantity är null, så används värdet 0 istället. *@
+                                <td class="">@(product.Quantity ?? 0)</td>
+                                <td class="">
+                                    <input type="hidden" name="ProductsToAddFromInput[@i].ProductId" class="form-control" value="@product.Id" />
+                                    <input type="number" name="ProductsToAddFromInput[@i].QuantityToAdd" value="0" min="0" />
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @* Måste lägga in alla object ifrån Db för att kunna hitta alla ProductsToAddFromInput ökningar*@
+                            <input type="hidden" name="ProductsToAddFromInput[@i].ProductId" class="form-control" value="@product.Id" />
+                            <input type="hidden" name="ProductsToAddFromInput[@i].QuantityToAdd" value="0" min="0" />
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <div id="paginationButtons"></div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary w-50 m-2">Uppdatera lager</button>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+
+@*-------------------LEVERANSKVITTON------------------------------------ *@
+<div class="bigCard">
+    <h2>Leveranskvitton</h2>
+
+    @if (Model.ReceiptsFromDbList != null)
+    {
+
+        @foreach (var receipt in Model.ReceiptsFromDbList.OrderByDescending(r => r.DateAndTimeCreated))
+        {
+            //FIXA SORTERING I BACKEND!!!!!!!!!!!!!!!!!!!!!!!!!
+            if(receipt.showAsOutgoingReceipt == true )
+            {
+                           
+                <div class="receiptCard">
+                    <p>Kvitto / @receipt.WorkerName / @receipt.DateAndTimeCreated</p>
+                    <table class="receiptTable">
+                        <thead>
+                            <tr>
+                                <th>Artikel</th>
+                                <th>Titel</th>
+                                <th>Storlek</th>
+                                <th>Pris</th>
+                                <th>Antal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var productFromDb in Model.ProductsFromDbList)
+                            {
+                                if (receipt.Id == productFromDb.ReceiptId)
+                                {
+                                    <tr>
+                                        <td>@productFromDb.ArticleNumber</td>
+                                        <td>@productFromDb.Title</td>
+                                        <td>@productFromDb.Size</td>
+                                        <td>@productFromDb.Price</td>
+                                        <td>@productFromDb.Quantity</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        }
+    }
+</div> 
+    
+<script src="~/js/OutgoingProductsTable.js"></script>

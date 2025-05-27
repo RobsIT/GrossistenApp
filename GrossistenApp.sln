@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrossistenApp", "GrossistenApp\GrossistenApp.csproj", "{19155B9E-0B97-47B6-9739-ABFC29372DC6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{19155B9E-0B97-47B6-9739-ABFC29372DC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19155B9E-0B97-47B6-9739-ABFC29372DC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19155B9E-0B97-47B6-9739-ABFC29372DC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19155B9E-0B97-47B6-9739-ABFC29372DC6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1744348D-7796-4441-AC4C-02DA6D885B35}
+	EndGlobalSection
+EndGlobal

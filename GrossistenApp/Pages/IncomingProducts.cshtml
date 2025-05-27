@@ -1,0 +1,208 @@
+﻿@page
+@model GrossistenApp.Pages.IncomingProductsModel
+@{
+    ViewData["Title"] = "Inköp";
+}
+
+
+@*----------- SKAPA PRODUKT --------------------------------------*@
+<div id="editForm" style="display: none;" class="bigCard mt-4">
+    <div class="createProductForm">
+
+        <h2>Skapa Produkt</h2>
+        <p>Lägger till produkt i Beställnings-listan</p>
+        <form method="post" asp-page-handler="CreateProduct">
+            <div class="form-floating mb-2">
+                <input asp-for="ProductObject.ArticleNumber" class="form-control" placeholder="ArtikelNummer" />
+                <label asp-for="ProductObject.ArticleNumber" class="control-label">Artikel</label>
+                <span  class="text-danger"></span>
+            </div>
+            
+            <div class="form-floating mb-2">
+                <input asp-for="ProductObject.Title" class="form-control" placeholder="Titel" />
+                <label asp-for="ProductObject.Title" class="control-label">Titel</label>
+                <span class="text-danger"></span>
+            </div>
+            
+            <div class="form-floating mb-2">
+                <input asp-for="ProductObject.Description" class="form-control" placeholder="Beskrivning" />
+                <label asp-for="ProductObject.Description" class="control-label">Beskrivning</label>
+                <span class="text-danger"></span>
+            </div>
+            
+            <div class="form-floating mb-2">
+                <input asp-for="ProductObject.Size" class="form-control" placeholder="Storlek" />
+                <label asp-for="ProductObject.Size" class="control-label">Storlek</label>
+                <span class="text-danger"></span>
+            </div>
+          
+            <div class="form-floating mb-2">
+                <input asp-for="ProductObject.Price" class="form-control" placeholder="Pris" />
+                <label asp-for="ProductObject.Price" class="control-label">Pris</label>
+                <span class="text-danger"></span>
+            </div>
+            
+            <div class="form-floating mb-2">
+                <input asp-for="ProductObject.Category" class="form-control" placeholder="Kategori" />
+                <label asp-for="ProductObject.Category" class="control-label">Kategori</label>
+                <span class="text-danger"></span>
+            </div>
+           
+            <div class="form-group text-center">
+                <button type="submit" class="btn btn-primary w-50 m-2">Skapa</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* Open and close create-form button*@
+@section Scripts {
+    <script>
+        const editButton = document.getElementById("openFormBtn");
+        const form = document.getElementById("editForm");
+
+        editButton.addEventListener("click", function () {
+            if (form.style.display === "none" || form.style.display === "") {
+                form.style.display = "block";
+                editButton.textContent = "Stäng formulär";
+            } else {
+                form.style.display = "none";
+                editButton.textContent = "Skapa ny";
+            }
+        });
+    </script>
+}
+
+@* ------------- BESTÄLLNINGSBARA PRODUKTER ------------------------------------*@
+<div class="bigCard">
+   
+    <div class="d-flex justify-content-between">
+
+        <div>
+            @* Empty to get the right flex-space *@
+        </div>
+        <div >
+            <h2 class="text-center">Beställningsbara Produkter</h2>
+        </div>
+        <div>
+            <button id="openFormBtn" class="btn btn-dark mx-2">Skapa ny</button>
+        </div>
+
+    </div>
+    
+    <p>Välj antal på vilka produkter som ska läggas till på lagret</p>
+    
+    <input type="text" id="searchInput" placeholder="Sök" class="form-control w-25" />
+    
+    <div class="orderableProductsTable" >
+        
+        <form method="post" asp-page-handler="AddToStock">
+            <table id="productsTable">
+                <thead>
+                    <tr>
+                        <th data-column="ArticleNumber">Artikelnummer</th>
+                        <th data-column="Title">Titel</th>
+                        <th data-column="Description">Beskrivning</th>
+                        <th data-column="Size">Storlek</th>
+                        <th data-column="Price">Pris</th>
+                        <th data-column="Category">Kategori</th>
+                        <th data-column="Quantity">Antal i lager</th>
+                        <th>Lägg till antal</th>
+                    </tr>
+                </thead>
+                <tbody id="productsBody" class="orderableProductsTable">
+                    @for (int i = 0; i < Model.ProductsFromDbList.Count; i++)
+                    {
+                        var product = Model.ProductsFromDbList[i];
+                       
+                        //FIXA SORTERING I BACKEND!!!!!!!!!!!!!!!!!!!!!!!!!
+                        if(true)
+                        {
+
+                            // data-product-id ger varje cell ett id.
+                            // När man klickar på en cell skickar JS-koden id till OnGet id-inparameter.
+                            // Vi vill inte ha på Quantity för då hoppar vi in på specific-sidan när man ökar i inputen. 
+                            <tr>
+                                <td data-product-id="@product.Id">@product.ArticleNumber</td>
+                                <td data-product-id="@product.Id">@product.Title</td>
+                                <td data-product-id="@product.Id">@product.Description</td>
+                                <td data-product-id="@product.Id">@product.Size</td>
+                                <td data-product-id="@product.Id">@product.Price kr</td>
+                                <td data-product-id="@product.Id">@product.Category</td>
+                                <td>@product.Quantity</td>
+                                <td>
+                                    <input type="hidden" name="ProductsToAddFromInput[@i].ProductId" class="form-control" value="@product.Id" />
+                                    <input type="number" name="ProductsToAddFromInput[@i].QuantityToAdd" value="0" min="0" />
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @* Måste lägga in alla object ifrån Db för att kunna hitta alla ProductsToAddFromInput ökningar*@
+                            <input type="hidden" name="ProductsToAddFromInput[@i].ProductId" class="form-control" value="@product.Id" />
+                            <input type="hidden" name="ProductsToAddFromInput[@i].QuantityToAdd" value="0" min="0" />
+                        }
+                    }
+                </tbody>
+            </table>
+           
+            <div id="paginationButtons"></div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary w-50 m-2">Uppdatera lager</button>
+            </div>
+        </form>
+   
+    </div>
+    
+</div>
+
+@*-------------------INKÖPSKVITTON------------------------------------ *@
+ <div class="bigCard">
+    <h2>Mottagningskvitton</h2>
+
+    @if (Model.ReceiptsFromDbList != null)
+    {
+        @using System.Linq
+        @foreach (var receipt in Model.ReceiptsFromDbList.OrderByDescending(r => r.DateAndTimeCreated))
+        {
+
+            //FIXA SORTERING I BACKEND!!!!!!!!!!!!!!!!!!!!!!!!!
+            if (true)
+            {
+                
+                <div class="receiptCard">
+                    <p>Kvitto / @receipt.WorkerName / @receipt.DateAndTimeCreated</p>
+                        <table class="receiptTable">
+                            <thead>
+                                <tr>
+                                    <th>Artikel</th>
+                                    <th>Titel</th>
+                                    <th>Storlek</th>
+                                    <th>Pris</th>
+                                    <th>Antal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var productFromDb in Model.ProductsFromDbList)
+                                {
+                                    if(receipt.Id == productFromDb.ReceiptId)
+                                    {
+                                        <tr>
+                                            <td>@productFromDb.ArticleNumber</td>
+                                            <td>@productFromDb.Title</td>
+                                            <td>@productFromDb.Size</td>
+                                            <td>@productFromDb.Price</td>
+                                            <td>@productFromDb.Quantity</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                </div>
+            }
+        }
+    }
+    
+</div>
+
+<script src="~/js/IncomingProductsTable.js"></script>

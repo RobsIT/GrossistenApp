@@ -1,0 +1,149 @@
+﻿@page
+@model GrossistenApp.Pages.SpecificProductDetailsModel
+@{
+}
+<div class="bigCard">
+    <div class="d-flex justify-content-between">
+        <div>
+            @* window.history.back() är bra för att minnas föra sidans läge. Funkar sådär... *@
+            <button type="button" onclick="window.history.back()" class="btn btn-dark">Tillbaka</button>
+        </div>
+        <div>
+            <h2>Produkt-Detaljer</h2>
+        </div>
+            @* Empty to get the right flex-space *@
+        <div></div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="w-50">
+                <div class="row">
+                    <div class="col-md-6 ">
+                        <div class="row mb-2 pe-4">
+                            <div class="col-6 border-bottom border-dark pb-2"><strong>Artikelnummer</strong></div>
+                            <div class="col-6 border-bottom border-dark pb-2">@Model.SpecificProductDetails.ArticleNumber</div>
+                        </div>
+                        <div class="row mb-2 pe-4">
+                            <div class="col-6 border-bottom border-dark pb-2"><strong>Titel</strong></div>
+                            <div class="col-6 border-bottom border-dark pb-2">@Model.SpecificProductDetails.Title</div>
+                        </div>
+                        <div class="row mb-2 pe-4">
+                            <div class="col-6 border-bottom border-dark pb-2"><strong>Kategori</strong></div>
+                            <div class="col-6 border-bottom border-dark pb-2">@Model.SpecificProductDetails.Category</div>
+                        </div>
+                 
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="row mb-2">
+                            <div class="col-6 border-bottom border-dark pb-2"><strong>Storlek</strong></div>
+                            <div class="col-6 border-bottom border-dark pb-2">@Model.SpecificProductDetails.Size</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-6 border-bottom border-dark pb-2"><strong>Pris</strong></div>
+                            <div class="col-6 border-bottom border-dark pb-2">@Model.SpecificProductDetails.Price?.ToString("F2")</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-6 border-bottom border-dark pb-2"><strong>Antal</strong></div>
+                            <div class="col-6 border-bottom border-dark pb-2">@Model.SpecificProductDetails.Quantity</div>
+                        </div>
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <strong>Beskrivning</strong>
+    <p>@Model.SpecificProductDetails.Description</p>
+
+    <div class="d-flex justify-content-end">
+        <button id="openFormBtn" class="btn btn-dark mx-2">Ändra</button>
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+            Ta bort
+        </button>
+        
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content text-center">
+                    <div class="modal-body">
+                        <p class="mb-4">⚠️ Är du säker på att du vill ta bort produkten?</p>
+
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
+
+                            <form method="post" asp-page-handler="Delete">
+                                <input type="hidden" asp-for="@Model.DeleteSpecificProductObject.Id" />
+                                <button type="submit" class="btn btn-danger">Ta bort</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div id="editForm" style="display: none;" class="bigCard mt-4">
+    <form method="post" asp-page-handler="Update">
+        <input type="hidden" asp-for="@Model.UpdateSpecificProductDetails.Id" />
+        <div class="form-floating mb-2">
+            <input asp-for="UpdateSpecificProductDetails.ArticleNumber"  class="form-control" placeholder="" />
+            <label asp-for="UpdateSpecificProductDetails.ArticleNumber">Artikel</label>
+        </div>
+
+        <div class="form-floating mb-2">
+            <input asp-for="UpdateSpecificProductDetails.Title"  class="form-control" placeholder="" />
+            <label asp-for="UpdateSpecificProductDetails.Title">Titel</label>
+        </div>
+
+        <div class="form-floating mb-2">
+            <input asp-for="UpdateSpecificProductDetails.Description"  class="form-control" placeholder="" />
+            <label asp-for="UpdateSpecificProductDetails.Description">Beskrivning</label>
+        </div>
+
+        <div class="form-floating mb-2">
+            <input asp-for="UpdateSpecificProductDetails.Size"  class="form-control" placeholder="" />
+            <label asp-for="UpdateSpecificProductDetails.Size">Storlek</label>
+        </div>
+
+        <div class="form-floating mb-2">
+            <input asp-for="UpdateSpecificProductDetails.Price"  class="form-control" placeholder="" />
+            <label asp-for="UpdateSpecificProductDetails.Price">Pris</label>
+        </div>
+
+        <div class="form-floating mb-2">
+            <input asp-for="UpdateSpecificProductDetails.Category"  class="form-control" placeholder="" />
+            <label asp-for="UpdateSpecificProductDetails.Category">Kategori</label>
+        </div> 
+        
+        <div class="form-floating mb-2">
+            <input asp-for="UpdateSpecificProductDetails.Quantity"  class="form-control" placeholder="" />
+            <label asp-for="UpdateSpecificProductDetails.Quantity">Antal</label>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary w-50 mt-3">Uppdatera</button>
+        </div>
+    </form>
+</div>
+
+@* Open and close updating-form button*@
+@section Scripts {
+    <script>
+        const editButton = document.getElementById("openFormBtn");
+        const form = document.getElementById("editForm");
+
+        editButton.addEventListener("click", function () {
+            if (form.style.display === "none" || form.style.display === "") {
+                form.style.display = "block";
+                editButton.textContent = "Stäng formulär";
+            } else {
+                form.style.display = "none";
+                editButton.textContent = "Ändra";
+            }
+        });
+    </script>
+}
