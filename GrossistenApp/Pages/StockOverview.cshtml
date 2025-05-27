@@ -2,7 +2,7 @@
 @model GrossistenApp.Pages.StockOverviewModel
 @{
     ViewData["Title"] = "Lageröversikt";
-    var totalProductsQuantity = Model.ProductsFromDbList;
+    var totalProductsQuantity = Model.StockOverviwProductsFromDbList;
 }
 
 <div class="bigCard">
@@ -26,14 +26,14 @@
                 </tr>
             </thead>
             <tbody id="productsBody" class="orderableProductsTable">
-                @foreach (var product in Model.ProductsFromDbList)
+                @foreach (var product in Model.StockOverviwProductsFromDbList)
                 {
                     // data-product-id ger varje rad ett id.
                     // När man klickar på raden skickar JS-koden id till OnGet id-inparameter.
                     <tr>
                         <td data-product-id="@product.Id">@product.ArticleNumber</td>
                         <td data-product-id="@product.Id">@product.Title</td>
-                        <td data-product-id="@product.Id">@product.Description.Substring(0,15)</td>
+                        <td data-product-id="@product.Id">@product.Description</td>
                         <td data-product-id="@product.Id">@product.Size</td>
                         <td data-product-id="@product.Id">@product.Price?.ToString("F2")</td>
                         <td data-product-id="@product.Id">@product.Category</td>

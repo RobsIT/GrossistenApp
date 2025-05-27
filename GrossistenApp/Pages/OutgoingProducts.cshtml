@@ -29,13 +29,10 @@
                     </tr>
                 </thead>
                 <tbody id="productsBody" class="orderableProductsTable">
-                    @for (int i = 0; i < Model.ProductsFromDbList.Count; i++)
+                    @for (int i = 0; i < Model.OutgoingProductsFromDbList.Count; i++)
                     {
-                        var product = Model.ProductsFromDbList[i];
+                        var product = Model.OutgoingProductsFromDbList[i];
 
-                        //FIXA SORTERING I BACKEND!!!!!!!!!!!!!!!!!!!!!!!!!
-                        if (true)
-                        {
                             // data-product-id ger varje cell ett id.
                             // När man klickar på en cell skickar JS-koden id till OnGet id-inparameter.
                             // Vi vill inte ha på Quantity för då hoppar vi in på specific-sidan när man ökar i inputen.
@@ -53,13 +50,6 @@
                                     <input type="number" name="ProductsToAddFromInput[@i].QuantityToAdd" value="0" min="0" />
                                 </td>
                             </tr>
-                        }
-                        else
-                        {
-                            @* Måste lägga in alla object ifrån Db för att kunna hitta alla ProductsToAddFromInput ökningar*@
-                            <input type="hidden" name="ProductsToAddFromInput[@i].ProductId" class="form-control" value="@product.Id" />
-                            <input type="hidden" name="ProductsToAddFromInput[@i].QuantityToAdd" value="0" min="0" />
-                        }
                     }
                 </tbody>
             </table>
@@ -78,10 +68,10 @@
 <div class="bigCard">
     <h2>Leveranskvitton</h2>
 
-    @if (Model.ReceiptsFromDbList != null)
+    @if (Model.OutgoingReceiptsFromDbList != null)
     {
 
-        @foreach (var receipt in Model.ReceiptsFromDbList.OrderByDescending(r => r.DateAndTimeCreated))
+        @foreach (var receipt in Model.OutgoingReceiptsFromDbList.OrderByDescending(r => r.DateAndTimeCreated))
         {
             //FIXA SORTERING I BACKEND!!!!!!!!!!!!!!!!!!!!!!!!!
             if(receipt.showAsOutgoingReceipt == true )
@@ -100,7 +90,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var productFromDb in Model.ProductsFromDbList)
+                            @foreach (var productFromDb in Model.ProductsFromDbListOnReceipt)
                             {
                                 if (receipt.Id == productFromDb.ReceiptId)
                                 {

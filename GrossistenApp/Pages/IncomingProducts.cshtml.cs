@@ -16,19 +16,25 @@ namespace GrossistenApp.Pages
         [BindProperty]
         public Product ProductObject { get; set; }
        
-        public List<Product> ProductsFromDbList { get; set; }
+        public List<Product> IncomingProductsFromDbList { get; set; }
+
+        public List<Product> ProductsFromDbListOnReceipt{ get; set; }
         [BindProperty]
         public List<ProductInputViewModel> ProductsToAddFromInput { get; set; }
        
-        public List<Receipt> ReceiptsFromDbList { get; set; }
+        public List<Receipt> IncomingReceiptsFromDbList { get; set; }
         [BindProperty]
         public Receipt ReceiptObject { get; set; }
 
 
         public async Task OnGetAsync()
         {
-            ProductsFromDbList = await _callApiService.GetDataFromApi<List<Product>>("Product");
-            ReceiptsFromDbList = await _callApiService.GetDataFromApi<List<Receipt>>("Receipt");
+            var AllProductsFromDbList = await _callApiService.GetDataFromApi<List<Product>>("Product");
+            IncomingProductsFromDbList = AllProductsFromDbList.Where(p => p.ShowInAvailableToPurchase ?? false).ToList();
+            ProductsFromDbListOnReceipt = AllProductsFromDbList.Where(p => p.ShowOnReceipt ?? false).ToList();
+
+            var AllReceiptsFromDbList = await _callApiService.GetDataFromApi<List<Receipt>>("Receipt");
+            IncomingReceiptsFromDbList = AllReceiptsFromDbList.Where(r => r.showAsIncomingReceipt ?? false).ToList();
 
         }
 
@@ -70,7 +76,7 @@ namespace GrossistenApp.Pages
 
            await _callApiService.EditItem("Product/bulk", allProductsFromDb);
 
-            //-------Create Receipt---------------
+            //-------Create Receipt---------------   
             ReceiptObject.WorkerName = "Svenne";
             ReceiptObject.showAsIncomingReceipt = true;
             ReceiptObject.showAsOutgoingReceipt = false;
@@ -79,7 +85,9 @@ namespace GrossistenApp.Pages
             await _callApiService.CreateItem("Receipt", ReceiptObject);
 
             //Lägg till dom ökade Produkterna till kvittot
-            int highestReceiptIdInDb = _callApiService.GetDataFromApi<List<Receipt>>("Receipt").Result.Max(r => r.Id);
+            var receipts = await _callApiService.GetDataFromApi<List<Receipt>>("Receipt");
+            int highestReceiptIdInDb = receipts.Max(r => r.Id);
+
             foreach (var inputObject in ProductsToAddFromInput)
             {
 
