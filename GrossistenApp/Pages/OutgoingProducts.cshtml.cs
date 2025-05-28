@@ -69,16 +69,17 @@ namespace GrossistenApp.Pages
         {
             var allProductsFromDb = await _callApiService.GetDataFromApi<List<Product>>("Product");
             var productsAddedToCount = new List<Product>();
-            // Update quantities for products that have additions
+            var successfullyProcessedInputs = new List<ProductInputViewModel>();
 
             foreach (var product in ProductsToAddFromInput)
             {
                 var specificProduct = allProductsFromDb.FirstOrDefault(p => p.Id == product.ProductId);
 
-                if (product.QuantityToAdd > 0 && product.QuantityToAdd <= specificProduct.Quantity && specificProduct != null)
+                if (product.QuantityToAdd > 0 && specificProduct != null && product.QuantityToAdd <= specificProduct.Quantity)
                 {
                     specificProduct.Quantity = (specificProduct.Quantity ?? 0) - product.QuantityToAdd;
                     productsAddedToCount.Add(specificProduct);
+                    successfullyProcessedInputs.Add(product);
                 }
             }
 
@@ -95,33 +96,30 @@ namespace GrossistenApp.Pages
 
                 await _callApiService.CreateItem("Receipt", ReceiptObject);
 
-                // Add products to receipt
+                // Add products to receipt - ONLY for successfully processed items
                 var receipts = await _callApiService.GetDataFromApi<List<Receipt>>("Receipt");
                 int highestReceiptIdInDb = receipts.Max(r => r.Id);
 
-                foreach (var product in ProductsToAddFromInput)
+                foreach (var product in successfullyProcessedInputs)
                 {
-                    if (product.QuantityToAdd > 0)
+                    var choosenProductToAdd = allProductsFromDb.FirstOrDefault(p => p.Id == product.ProductId);
+
+                    if (choosenProductToAdd != null)
                     {
-                        var choosenProductToAdd = allProductsFromDb.FirstOrDefault(p => p.Id == product.ProductId);
+                        ProductObject.Id = 0;
+                        ProductObject.ArticleNumber = choosenProductToAdd.ArticleNumber;
+                        ProductObject.Title = choosenProductToAdd.Title;
+                        ProductObject.Description = choosenProductToAdd.Description;
+                        ProductObject.Size = choosenProductToAdd.Size;
+                        ProductObject.Price = choosenProductToAdd.Price;
+                        ProductObject.Category = choosenProductToAdd.Category;
+                        ProductObject.Quantity = product.QuantityToAdd;
+                        ProductObject.ReceiptId = highestReceiptIdInDb;
+                        ProductObject.ShowInAvailableToPurchase = false;
+                        ProductObject.ShowInStock = false;
+                        ProductObject.ShowOnReceipt = true;
 
-                        if (choosenProductToAdd != null)
-                        {
-                            ProductObject.Id = 0;
-                            ProductObject.ArticleNumber = choosenProductToAdd.ArticleNumber;
-                            ProductObject.Title = choosenProductToAdd.Title;
-                            ProductObject.Description = choosenProductToAdd.Description;
-                            ProductObject.Size = choosenProductToAdd.Size;
-                            ProductObject.Price = choosenProductToAdd.Price;
-                            ProductObject.Category = choosenProductToAdd.Category;
-                            ProductObject.Quantity = product.QuantityToAdd;
-                            ProductObject.ReceiptId = highestReceiptIdInDb;
-                            ProductObject.ShowInAvailableToPurchase = false;
-                            ProductObject.ShowInStock = false;
-                            ProductObject.ShowOnReceipt = true;
-
-                            await _callApiService.CreateItem("Product", ProductObject);
-                        }
+                        await _callApiService.CreateItem("Product", ProductObject);
                     }
                 }
             }
