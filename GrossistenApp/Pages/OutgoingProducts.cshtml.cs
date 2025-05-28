@@ -9,8 +9,8 @@ namespace GrossistenApp.Pages
 {
     public class OutgoingProductsModel : PageModel
     {
-        private readonly CallApiService _callApiService;
-        public OutgoingProductsModel(CallApiService callApiService)
+        private readonly ICallApiService _callApiService;
+        public OutgoingProductsModel(ICallApiService callApiService)
         {
             _callApiService = callApiService;
         }

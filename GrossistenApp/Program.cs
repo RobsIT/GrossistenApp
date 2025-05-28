@@ -16,7 +16,7 @@ namespace GrossistenApp
 
             // Add services to the container.
             builder.Services.AddRazorPages();
-            builder.Services.AddScoped<CallApiService>();
+            builder.Services.AddScoped<ICallApiService, CallApiService>();
 
             var app = builder.Build();
 

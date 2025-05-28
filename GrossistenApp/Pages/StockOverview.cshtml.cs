@@ -8,8 +8,8 @@ namespace GrossistenApp.Pages
 {
     public class StockOverviewModel : PageModel
     {
-        private readonly CallApiService _callApiService;
-        public StockOverviewModel(CallApiService callApiService)
+        private readonly ICallApiService _callApiService;
+        public StockOverviewModel(ICallApiService callApiService)
         {
             _callApiService = callApiService;
         }
