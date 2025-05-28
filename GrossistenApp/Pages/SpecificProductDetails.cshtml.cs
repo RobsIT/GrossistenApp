@@ -23,8 +23,18 @@ namespace GrossistenApp.Pages
 
         public async Task OnGetAsync(int id)
         {
-            
-            SpecificProductDetails = await _callApiService.GetDataFromApi<Product>($"Product/{id}");    
+            try
+            {
+                SpecificProductDetails = await _callApiService.GetDataFromApi<Product>($"Product/{id}");  
+            }
+            catch(Exception)
+            {
+                SpecificProductDetails = new Product
+                {
+                    Title = "Kan inte hämta information testa igen.",
+                };
+            }
+              
             UpdateSpecificProductDetails = SpecificProductDetails;
             DeleteSpecificProductObject = SpecificProductDetails;
         }
