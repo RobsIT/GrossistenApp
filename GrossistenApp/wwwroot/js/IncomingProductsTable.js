@@ -21,9 +21,11 @@ document.addEventListener("DOMContentLoaded", function () {
    
     function displayOnlyFilteredRowsWithPagination() {
 
-        //Hämtar alla < tr > -rader(produktrader) inuti #productsBody
-        //Dessa är alla rader som visas i tabellen innan någon filtrering/pagination har tillämpats.
-        const rows = document.querySelectorAll("#productsBody tr");
+        const tbody = document.querySelector("tbody");
+
+        // Gömmer alla rader, för att börja om från en "ren" visning.
+        //Varje rad sätts till display: none, så att den inte syns.
+        allOriginalRows.forEach(row => row.style.display = "none");
 
         //Räknar ut startindex för vilken rad som ska visas på nuvarande sida(currentPage).
         //Exempel: Om currentPage = 2 och rowsPerPage = 10, börjar vi på rad (2 - 1) * 10 = 10.
@@ -33,23 +35,11 @@ document.addEventListener("DOMContentLoaded", function () {
         //Ex: start = 10 → end = 20 → vi visar rad 10 till 19 (index).
         const end = start + rowsPerPage;
 
-        // Gömmer alla rader, för att börja om från en "ren" visning.
-        //Varje rad sätts till display: none, så att den inte syns.
-        rows.forEach(row => row.style.display = "none");
-
-        // Visa bara de filtrerade, i sorterad ordning
-        // Går igenom varje index i filteredRowIndexes – alltså en lista med rad-index för de rader
-        //som matchar ett sökfilter eller sorteringsordning.
-        //i är räknaren (positionen i filtreringsresultatet), inte det ursprungliga indexet i rows.
-        filteredRowIndexes.forEach((rowIndex, i) => {
-
-            //Kollar om raden tillhör aktuell paginerad sida – endast rader där index i är mellan start och end visas.
-            if (i >= start && i < end) {
-
-                //Gör raden synlig igen genom att återställa display till tom sträng (vilket gör att den visas normalt enligt CSS).
-                rows[rowIndex].style.display = "";
-            }
-        });
+        // Visa endast rader på den aktuella sidan
+        for (let i = start; i < end && i < filteredRowIndexes.length; i++) {
+            const row = allOriginalRows[filteredRowIndexes[i]];
+            row.style.display = "";
+        }
         console.log("displayOnlyFilteredRowsWithPagination")
     }
     
