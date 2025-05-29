@@ -5,7 +5,7 @@ using GrossistenApp.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
-namespace GrossitenTest
+namespace GrossistenTest
 {
     public class OutgoingProductsModelTests
     {
