@@ -21,28 +21,24 @@ document.addEventListener("DOMContentLoaded", function () {
    
     function displayOnlyFilteredRowsWithPagination() {
 
-        const tbody = document.querySelector("tbody");
-
         // Gömmer alla rader, för att börja om från en "ren" visning.
         //Varje rad sätts till display: none, så att den inte syns.
         allOriginalRows.forEach(row => row.style.display = "none");
 
         //Räknar ut startindex för vilken rad som ska visas på nuvarande sida(currentPage).
         //Exempel: Om currentPage = 2 och rowsPerPage = 10, börjar vi på rad (2 - 1) * 10 = 10.
-        const start = (currentPage - 1) * rowsPerPage;
+        const startIndexForCurrentPageRows = (currentPage - 1) * rowsPerPage;
 
         //Räknar ut slutindex(icke - exklusivt) – alltså den sista raden som ska visas.
-        //Ex: start = 10 → end = 20 → vi visar rad 10 till 19 (index).
-        const end = start + rowsPerPage;
+        //Ex: startIndex = 10 → endIndex = 20 → vi visar rad 10 till 19 (index).
+        const endIndexForCurrentPageRows = startIndexForCurrentPageRows + rowsPerPage;
 
-        // Visa endast rader på den aktuella sidan
-        for (let i = start; i < end && i < filteredRowIndexes.length; i++) {
+        // Visa endast rader för den aktuella sidan
+        for (let i = startIndexForCurrentPageRows; i < endIndexForCurrentPageRows && i < filteredRowIndexes.length; i++) {
             const row = allOriginalRows[filteredRowIndexes[i]];
             row.style.display = "";
         }
-        console.log("displayOnlyFilteredRowsWithPagination")
     }
-    
 
     // Funktion för att skapa och visa sidnavigeringsknappar
     function renderPaginationButtons() {
@@ -69,26 +65,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
             pagination.appendChild(btn);
         }
-        console.log("renderPaginationButtons")
     }
-
-   
 
     // Funktion för att filtrera rader baserat på söktext.
     //  Raderna döljs bara vid filtrering vilket möjliggör att alla rader kommer med i input-form även
     //  fast dom är bortfiltrerade för tillfället.
     function filterRowsBasedOnSearchInput() {
-        const query = searchInput.value.toLowerCase();
-        const rows = document.querySelectorAll("#productsBody tr");
+        const queryFromSearchInput = searchInput.value.toLowerCase();
+        const rowsInTable = document.querySelectorAll("#productsBody tr");
 
         filteredRowIndexes = []; // Håller reda på vilka rader som ska visas
 
-        rows.forEach((row, index) => {
-            const match = Array.from(row.cells).some(cell =>
-                cell.textContent.toLowerCase().includes(query)
+        rowsInTable.forEach((row, index) => {
+            const matchToTextContent = Array.from(row.cells).some(cell =>
+                cell.textContent.toLowerCase().includes(queryFromSearchInput)
             );
 
-            if (match) {
+            if (matchToTextContent) {
                 filteredRowIndexes.push(index);
             }
 
@@ -99,13 +92,12 @@ document.addEventListener("DOMContentLoaded", function () {
         currentPage = 1;
         displayOnlyFilteredRowsWithPagination();
         renderPaginationButtons();
-        console.log("filterRowsBasedOnSearchInput")
     }
 
     function updateTableHeadSortArrows() {
-        const headers = table.querySelectorAll("th[data-column]");
+        const headersInTable = table.querySelectorAll("th[data-column]");
 
-        headers.forEach((th, index) => {
+        headersInTable.forEach((th, index) => {
             const label = th.getAttribute("data-label");
 
             if (!label) return; // Hoppa över kolumner utan sortering
@@ -114,12 +106,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Lägg till pil på aktuell kolumn
             if (index === currentSortedColumn.column) {
-                th.innerHTML += currentSortedColumn.ascending ? " &#9650;" : " &#9660;";//Pil upp och pil ner
+                th.innerHTML += currentSortedColumn.ascending ? " &#9660;" : " &#9650;";//Pil ner och pil upp
             }
         });
-        console.log("updateTableHeadSortArrows")
     }
-
 
     // Funktion för att sortera rader enligt angiven kolumn
     function sortByColumn(index) {
@@ -158,14 +148,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 //Sortera numeriskt.
                 //Om ascending är true, sorteras i stigande ordning(aNum - bNum).
                 //Annars i fallande ordning.
-                console.log("Sorterar: ", aTableCellText, " vs ", bTableCellText);
                 return ascending ? aTryTextAsANumber - bTryTextAsANumber : bTryTextAsANumber - aTryTextAsANumber;
             }
 
             //Om minst ett av värdena inte är ett tal:
             //Sortera alfabetiskt med localeCompare() (tar hänsyn till språkliga regler).
             //Sorteringsriktning beror på ascending.
-            console.log("Sorterar: ", aTableCellText, " vs ", bTableCellText);
             return ascending ? aTableCellText.localeCompare(bTableCellText, 'sv') : bTableCellText.localeCompare(aTableCellText, 'sv');
         });
 
@@ -182,10 +170,7 @@ document.addEventListener("DOMContentLoaded", function () {
         displayOnlyFilteredRowsWithPagination();
         renderPaginationButtons();
         updateTableHeadSortArrows();
-       console.log("SortByColumn")
     }
-
-   
 
     // Händelse för sökfältet så att det filtrerar medan man skriver
     searchInput.addEventListener("input", filterRowsBasedOnSearchInput);
@@ -195,7 +180,6 @@ document.addEventListener("DOMContentLoaded", function () {
     tableColumnHeaders.forEach((th, index) => {
         th.style.cursor = "pointer"; // Ändra muspekaren till pekande hand
         th.addEventListener("click", () => sortByColumn(index)); // Sortera efter vald kolumn
-        console.log("Head Index")
     });
 
     // Klickhändelser på varje cell för att navigera till produktdetaljer
@@ -213,12 +197,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
- 
-
     displayOnlyFilteredRowsWithPagination();
     renderPaginationButtons();
-    console.log("allOriginalRows.length: ", allOriginalRows.length);
-    console.log("filteredRowIndexes: ", filteredRowIndexes);
-    console.log("Big function end")
 });
 

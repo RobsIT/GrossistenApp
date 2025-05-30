@@ -152,7 +152,7 @@
     @if (Model.IncomingReceiptsFromDbList != null)
     {
         @using System.Linq
-        @foreach (var receipt in Model.IncomingReceiptsFromDbList.OrderByDescending(r => r.DateAndTimeCreated))
+        @foreach (var receipt in Model.IncomingReceiptsFromDbList)
         {
 
             //FIXA SORTERING I BACKEND!!!!!!!!!!!!!!!!!!!!!!!!!
