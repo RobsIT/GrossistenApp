@@ -16,8 +16,6 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentSortedColumn = { column: null, ascending: true }; // Håller koll på vilken kolumn som är sorterad och i vilken riktning
 
     let filteredRowIndexes = Array.from(allFilterableRows).map((_, i) => i); // Alla rader visas initialt
-
-
    
     function displayOnlyFilteredRowsWithPagination() {
 

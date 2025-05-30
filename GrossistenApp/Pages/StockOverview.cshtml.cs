@@ -21,7 +21,7 @@ namespace GrossistenApp.Pages
         public async Task OnGetAsync()
         {
             var AllProductsFromDbList = await _callApiService.GetDataFromApi<List<Product>>("Product");
-            StockOverviwProductsFromDbList = AllProductsFromDbList.Where(p => p.ShowInStock ?? false).ToList();
+            StockOverviwProductsFromDbList = AllProductsFromDbList.Where(p => p.ShowInStock ?? false).OrderByDescending(p => p.Id).ToList();
 
         }
     }
