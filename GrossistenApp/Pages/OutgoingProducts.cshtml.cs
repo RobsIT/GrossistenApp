@@ -40,10 +40,10 @@ namespace GrossistenApp.Pages
             {
                 allProductsFromDbList = new List<Product>
                 {
-                    new Product { Title = "Kunde inte hämta information, testa igen senare(Starta Api).", ShowInStock = true}
+                    new Product { Title = "Kunde inte hÃ¤mta information, testa igen senare(Starta Api).", ShowInStock = true}
                 };
             }
-            OutgoingProductsFromDbList = allProductsFromDbList.Where(p => p.ShowInStock ?? false).ToList();
+            OutgoingProductsFromDbList = allProductsFromDbList.Where(p => p.ShowInStock ?? false).OrderByDescending(p => p.Id).ToList();
             ProductsFromDbListOnReceipt = allProductsFromDbList.Where(p => p.ShowOnReceipt ?? false).ToList();
 
 
@@ -57,12 +57,11 @@ namespace GrossistenApp.Pages
             {
                 allReceiptsFromDbList = new List<Receipt>
                 { 
-                    new Receipt { WorkerName = "Kunde inte hämta information", showAsOutgoingReceipt = true }
+                    new Receipt { WorkerName = "Kunde inte hÃ¤mta information", showAsOutgoingReceipt = true }
                 };
             }
 
-
-            OutgoingReceiptsFromDbList = allReceiptsFromDbList.Where(r => r.showAsOutgoingReceipt ?? false).ToList();
+            OutgoingReceiptsFromDbList = allReceiptsFromDbList.Where(r => r.showAsOutgoingReceipt ?? false).OrderByDescending(r => r.DateAndTimeCreated).ToList();
         }
 
         public async Task<IActionResult> OnPostTakeFromStockAsync()
@@ -70,7 +69,9 @@ namespace GrossistenApp.Pages
             var allProductsFromDb = await _callApiService.GetDataFromApi<List<Product>>("Product");
             var productsAddedToCount = new List<Product>();
             var successfullyProcessedInputs = new List<ProductInputViewModel>();
-
+            
+            // Update quantities for products that have additions
+            
             foreach (var product in ProductsToAddFromInput)
             {
                 var specificProduct = allProductsFromDb.FirstOrDefault(p => p.Id == product.ProductId);
