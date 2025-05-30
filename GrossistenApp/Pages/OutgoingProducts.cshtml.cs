@@ -17,6 +17,7 @@ namespace GrossistenApp.Pages
         [BindProperty]
         public Product ProductObject { get; set; }
 
+        public List<Product> ProductsFromDbList { get; set; }
         public List<Product> OutgoingProductsFromDbList { get; set; }
         public List<Product> ProductsFromDbListOnReceipt { get; set; }
         [BindProperty]
@@ -29,11 +30,37 @@ namespace GrossistenApp.Pages
 
         public async Task OnGetAsync()
         {
-            var allProductsFromDbList = await _callApiService.GetDataFromApi<List<Product>>("Product");
+            List<Product> allProductsFromDbList;
+
+            try
+            {
+                allProductsFromDbList = await _callApiService.GetDataFromApi<List<Product>>("Product");
+            }
+            catch(Exception)
+            {
+                allProductsFromDbList = new List<Product>
+                {
+                    new Product { Title = "Kunde inte hämta information, testa igen senare(Starta Api).", ShowInStock = true}
+                };
+            }
             OutgoingProductsFromDbList = allProductsFromDbList.Where(p => p.ShowInStock ?? false).OrderByDescending(p => p.Id).ToList();
             ProductsFromDbListOnReceipt = allProductsFromDbList.Where(p => p.ShowOnReceipt ?? false).ToList();
 
-            var allReceiptsFromDbList = await _callApiService.GetDataFromApi<List<Receipt>>("Receipt");
+
+            List<Receipt> allReceiptsFromDbList;
+
+            try
+            {
+                allReceiptsFromDbList = await _callApiService.GetDataFromApi<List<Receipt>>("Receipt");
+            }
+            catch(Exception)
+            {
+                allReceiptsFromDbList = new List<Receipt>
+                { 
+                    new Receipt { WorkerName = "Kunde inte hämta information", showAsOutgoingReceipt = true }
+                };
+            }
+
             OutgoingReceiptsFromDbList = allReceiptsFromDbList.Where(r => r.showAsOutgoingReceipt ?? false).OrderByDescending(r => r.DateAndTimeCreated).ToList();
         }
 

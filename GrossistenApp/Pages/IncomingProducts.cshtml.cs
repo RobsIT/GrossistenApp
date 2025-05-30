@@ -29,13 +29,37 @@ namespace GrossistenApp.Pages
 
         public async Task OnGetAsync()
         {
-            var allProductsFromDbList = await _callApiService.GetDataFromApi<List<Product>>("Product");
+            List<Product> allProductsFromDbList;
+            
+            try
+            {
+                 allProductsFromDbList = await _callApiService.GetDataFromApi<List<Product>>("Product");
+            }
+            catch(Exception)
+            {
+                allProductsFromDbList = new List<Product>
+                {
+                    new Product { Title = "Kunde inte hÃ¤mta information, testa igen senare(Starta Api).", ShowInAvailableToPurchase = true}
+                };
+            }
             IncomingProductsFromDbList = allProductsFromDbList.Where(p => p.ShowInAvailableToPurchase ?? false).OrderByDescending(p => p.Id).ToList();
             ProductsFromDbListOnReceipt = allProductsFromDbList.Where(p => p.ShowOnReceipt ?? false).ToList();
 
-            var allReceiptsFromDbList = await _callApiService.GetDataFromApi<List<Receipt>>("Receipt");
-            IncomingReceiptsFromDbList = allReceiptsFromDbList.Where(r => r.showAsIncomingReceipt ?? false).OrderByDescending(r => r.DateAndTimeCreated).ToList();
 
+            List<Receipt> allReceiptsFromDbList;
+
+            try
+            {
+                allReceiptsFromDbList = await _callApiService.GetDataFromApi<List<Receipt>>("Receipt");
+            }
+            catch (Exception)
+            {
+                allReceiptsFromDbList = new List<Receipt>
+                {
+                    new Receipt { WorkerName = "Kunde inte hÃ¤mta information", showAsIncomingReceipt = true }
+                };
+            }
+            IncomingReceiptsFromDbList = allReceiptsFromDbList.Where(r => r.showAsIncomingReceipt ?? false).OrderByDescending(r => r.DateAndTimeCreated).ToList();
         }
 
         //Form 1 in View
@@ -56,7 +80,7 @@ namespace GrossistenApp.Pages
 
             var allProductsFromDb = await _callApiService.GetDataFromApi<List<Product>>("Product");
 
-            //----Öka antal från Beställningsbara Produkter formuläret på befintlig produkt------
+            //----Ã–ka antal frÃ¥n BestÃ¤llningsbara Produkter formulÃ¤ret pÃ¥ befintlig produkt------
             foreach (var inputObject in ProductsToAddFromInput)
             {
                 if (inputObject.QuantityToAdd > 0)
@@ -67,7 +91,7 @@ namespace GrossistenApp.Pages
                         
                         specificProduct.Quantity = specificProduct.Quantity + inputObject.QuantityToAdd;
 
-                        // Uppdatera showInStock boolen om lagret är mer än antal 0. Sql-Db läser true/faulse som 1/0.
+                        // Uppdatera showInStock boolen om lagret Ã¤r mer Ã¤n antal 0. Sql-Db lÃ¤ser true/faulse som 1/0.
                         specificProduct.ShowInStock = specificProduct.Quantity > 0;
                     }
                 
@@ -84,7 +108,7 @@ namespace GrossistenApp.Pages
 
             await _callApiService.CreateItem("Receipt", ReceiptObject);
 
-            //Lägg till dom ökade Produkterna till kvittot
+            //LÃ¤gg till dom Ã¶kade Produkterna till kvittot
             var receipts = await _callApiService.GetDataFromApi<List<Receipt>>("Receipt");
             int highestReceiptIdInDb = receipts.Max(r => r.Id);
 
@@ -94,10 +118,10 @@ namespace GrossistenApp.Pages
                 if (inputObject.QuantityToAdd > 0)
                 {
 
-                    //Hämtar produkten som motsvarar Id:t i ProductsToAddFromInput-listan.
+                    //HÃ¤mtar produkten som motsvarar Id:t i ProductsToAddFromInput-listan.
                     var choosenProductToAdd = allProductsFromDb.FirstOrDefault(p => p.Id == inputObject.ProductId);
 
-                    ProductObject.Id = 0;//VIKTIGT med 0 för att databasen ska hantera Id.
+                    ProductObject.Id = 0;//VIKTIGT med 0 fÃ¶r att databasen ska hantera Id.
                     ProductObject.ArticleNumber = choosenProductToAdd.ArticleNumber;
                     ProductObject.Title = choosenProductToAdd.Title;
                     ProductObject.Description = choosenProductToAdd.Description;
