@@ -30,19 +30,19 @@ namespace GrossistenApp.Pages
         public async Task OnGetAsync()
         {
             var allProductsFromDbList = await _callApiService.GetDataFromApi<List<Product>>("Product");
-            OutgoingProductsFromDbList = allProductsFromDbList.Where(p => p.ShowInStock ?? false).ToList();
+            OutgoingProductsFromDbList = allProductsFromDbList.Where(p => p.ShowInStock ?? false).OrderByDescending(p => p.Id).ToList();
             ProductsFromDbListOnReceipt = allProductsFromDbList.Where(p => p.ShowOnReceipt ?? false).ToList();
 
             var allReceiptsFromDbList = await _callApiService.GetDataFromApi<List<Receipt>>("Receipt");
-            OutgoingReceiptsFromDbList = allReceiptsFromDbList.Where(r => r.showAsOutgoingReceipt ?? false).ToList();
+            OutgoingReceiptsFromDbList = allReceiptsFromDbList.Where(r => r.showAsOutgoingReceipt ?? false).OrderByDescending(r => r.DateAndTimeCreated).ToList();
         }
 
         public async Task<IActionResult> OnPostTakeFromStockAsync()
         {
             var allProductsFromDb = await _callApiService.GetDataFromApi<List<Product>>("Product");
             var productsAddedToCount = new List<Product>();
+            
             // Update quantities for products that have additions
-
             foreach (var product in ProductsToAddFromInput)
             {
                 var specificProduct = allProductsFromDb.FirstOrDefault(p => p.Id == product.ProductId);

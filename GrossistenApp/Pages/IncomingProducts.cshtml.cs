@@ -29,12 +29,12 @@ namespace GrossistenApp.Pages
 
         public async Task OnGetAsync()
         {
-            var AllProductsFromDbList = await _callApiService.GetDataFromApi<List<Product>>("Product");
-            IncomingProductsFromDbList = AllProductsFromDbList.Where(p => p.ShowInAvailableToPurchase ?? false).OrderByDescending(p => p.Id).ToList();
-            ProductsFromDbListOnReceipt = AllProductsFromDbList.Where(p => p.ShowOnReceipt ?? false).ToList();
+            var allProductsFromDbList = await _callApiService.GetDataFromApi<List<Product>>("Product");
+            IncomingProductsFromDbList = allProductsFromDbList.Where(p => p.ShowInAvailableToPurchase ?? false).OrderByDescending(p => p.Id).ToList();
+            ProductsFromDbListOnReceipt = allProductsFromDbList.Where(p => p.ShowOnReceipt ?? false).ToList();
 
-            var AllReceiptsFromDbList = await _callApiService.GetDataFromApi<List<Receipt>>("Receipt");
-            IncomingReceiptsFromDbList = AllReceiptsFromDbList.Where(r => r.showAsIncomingReceipt ?? false).OrderByDescending(r => r.DateAndTimeCreated).ToList();
+            var allReceiptsFromDbList = await _callApiService.GetDataFromApi<List<Receipt>>("Receipt");
+            IncomingReceiptsFromDbList = allReceiptsFromDbList.Where(r => r.showAsIncomingReceipt ?? false).OrderByDescending(r => r.DateAndTimeCreated).ToList();
 
         }
 
