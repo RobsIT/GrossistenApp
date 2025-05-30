@@ -18,13 +18,13 @@
             <table id="productsTable">
                 <thead>
                     <tr>
-                        <th data-column="ArticleNumber">Artikelnummer</th>
-                        <th data-column="Title">Titel</th>
-                        <th data-column="Description">Beskrivning</th>
-                        <th data-column="Size">Storlek</th>
-                        <th data-column="Price">Pris</th>
-                        <th data-column="Category">Kategori</th>
-                        <th data-column="Quantity">Antal i lager</th>
+                        <th data-column="ArticleNumber" data-label="Artikelnummer">Artikelnummer</th>
+                        <th data-column="Title" data-label="Titel">Titel</th>
+                        <th data-column="Description" data-label="Beskrivning">Beskrivning</th>
+                        <th data-column="Size" data-label="Storlek">Storlek</th>
+                        <th data-column="Price" data-label="Pris">Pris</th>
+                        <th data-column="Category" data-label="Kategori">Kategori</th>
+                        <th data-column="Quantity" data-label="Antal">Antal i lager</th>
                         <th>Lägg till antal</th>
                     </tr>
                 </thead>
@@ -43,9 +43,8 @@
                                 <td data-product-id="@product.Id">@product.Size</td>
                                 <td data-product-id="@product.Id">@product.Price kr</td>
                                 <td data-product-id="@product.Id">@product.Category</td>
-                                @*  ?? 0 betyder att om p.Quantity är null, så används värdet 0 istället. *@
-                                <td class="">@(product.Quantity ?? 0)</td>
-                                <td class="">
+                                <td >@product.Quantity</td>
+                                <td >
                                     <input type="hidden" name="ProductsToAddFromInput[@i].ProductId" class="form-control" value="@product.Id" />
                                     <input type="number" name="ProductsToAddFromInput[@i].QuantityToAdd" value="0" min="0" />
                                 </td>
@@ -71,11 +70,8 @@
     @if (Model.OutgoingReceiptsFromDbList != null)
     {
 
-        @foreach (var receipt in Model.OutgoingReceiptsFromDbList.OrderByDescending(r => r.DateAndTimeCreated))
+        @foreach (var receipt in Model.OutgoingReceiptsFromDbList)
         {
-            //FIXA SORTERING I BACKEND!!!!!!!!!!!!!!!!!!!!!!!!!
-            if(receipt.showAsOutgoingReceipt == true )
-            {
                            
                 <div class="receiptCard">
                     <p>Kvitto / @receipt.WorkerName / @receipt.DateAndTimeCreated</p>
@@ -107,7 +103,7 @@
                     </table>
                 </div>
             }
-        }
+        
     }
 </div> 
     

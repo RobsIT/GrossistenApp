@@ -1,59 +1,49 @@
-// Vänta tills hela HTML-dokumentet har laddats innan koden körs
+ï»¿// VÃ¤nta tills hela HTML-dokumentet har laddats innan koden kÃ¶rs
 document.addEventListener("DOMContentLoaded", function () {
     const rowsPerPage = 10; // Antal rader att visa per sida
-    let currentPage = 1; // Den aktuella sidan (startar på 1)
+    let currentPage = 1; // Den aktuella sidan (startar pÃ¥ 1)
 
-    // Hämta relevanta DOM-element
+    // HÃ¤mta relevanta DOM-element
     const table = document.getElementById("productsTable");
     const tbody = document.getElementById("productsBody");
+
+    const searchInput = document.getElementById("searchInput"); // SÃ¶kfÃ¤ltet
+    const pagination = document.getElementById("paginationButtons"); // BehÃ¥llare fÃ¶r sidnavigeringsknappar
+
     const allOriginalRows = Array.from(tbody.getElementsByTagName("tr")); // Alla rader i tabellen
 
-    const searchInput = document.getElementById("searchInput"); // Sökfältet
-    const pagination = document.getElementById("paginationButtons"); // Behållare för sidnavigeringsknappar
-
     let allFilterableRows = [...allOriginalRows]; // Kopia av rader, som kan filtreras
-    let currentSortedColumn = { column: null, ascending: true }; // Håller koll på vilken kolumn som är sorterad och i vilken riktning
+    let currentSortedColumn = { column: null, ascending: true }; // HÃ¥ller koll pÃ¥ vilken kolumn som Ã¤r sorterad och i vilken riktning
 
-    let filteredRowIndexes = Array.from(allOriginalRows).map((_, i) => i); // Alla rader visas initialt
+    let filteredRowIndexes = Array.from(allFilterableRows).map((_, i) => i); // Alla rader visas initialt
+   
+    function displayOnlyFilteredRowsWithPagination() {
 
-    renderFilteredRowsWithPagination();
-    renderPaginationButtons();
-    
+        // GÃ¶mmer alla rader, fÃ¶r att bÃ¶rja om frÃ¥n en "ren" visning.
+        //Varje rad sÃ¤tts till display: none, sÃ¥ att den inte syns.
+        allOriginalRows.forEach(row => row.style.display = "none");
 
-    // Lägg till klickhändelser på varje cell för att navigera till produktdetaljer
-    document.querySelectorAll("#productsTable td[data-product-id]").forEach(cell => {
-        cell.addEventListener("click", (event) => {
-            // Undvik att bubbla upp till andra element
-            // event.stopPropagation() – Förhindrar att klick händelsen bubblar upp och
-            // påverkar andra element(som form eller andra klickbara saker).
-            event.stopPropagation();
+        //RÃ¤knar ut startindex fÃ¶r vilken rad som ska visas pÃ¥ nuvarande sida(currentPage).
+        //Exempel: Om currentPage = 2 och rowsPerPage = 10, bÃ¶rjar vi pÃ¥ rad (2 - 1) * 10 = 10.
+        const startIndexForCurrentPageRows = (currentPage - 1) * rowsPerPage;
 
-            const productId = cell.getAttribute("data-product-id");
-            if (productId) {
-                window.location.href = `SpecificProductDetails?id=${productId}`;
-            }
-        });
-    });
+        //RÃ¤knar ut slutindex(icke - exklusivt) â€“ alltsÃ¥ den sista raden som ska visas.
+        //Ex: startIndex = 10 â†’ endIndex = 20 â†’ vi visar rad 10 till 19 (index).
+        const endIndexForCurrentPageRows = startIndexForCurrentPageRows + rowsPerPage;
 
-    // Funktion för att visa rader på aktuell sida
-    function renderTableRows() {
-        const start = (currentPage - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-
-        const rows = document.querySelectorAll("#productsBody tr");
-
-        rows.forEach((row, index) => {
-            // Endast visa de rader som är inom den aktuella sidans intervall
-            row.style.display = (index >= start && index < end) ? "" : "none";
-        });
+        // Visa endast rader fÃ¶r den aktuella sidan
+        for (let i = startIndexForCurrentPageRows; i < endIndexForCurrentPageRows && i < filteredRowIndexes.length; i++) {
+            const row = allOriginalRows[filteredRowIndexes[i]];
+            row.style.display = "";
+        }
     }
 
-    // Funktion för att skapa och visa sidnavigeringsknappar
+    // Funktion fÃ¶r att skapa och visa sidnavigeringsknappar
     function renderPaginationButtons() {
-        pagination.innerHTML = ""; // Töm tidigare knappar
+        pagination.innerHTML = ""; // TÃ¶m tidigare knappar
 
         const totalPages = Math.ceil(filteredRowIndexes.length / rowsPerPage);
-        if (totalPages <= 1) return; // Visa inte om bara en sida
+        if (totalPages <= 1) return; // Visa inte knappar om bara en sida
 
         for (let i = 1; i <= totalPages; i++) {
             const btn = document.createElement("button");
@@ -67,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             btn.addEventListener("click", () => {
                 currentPage = i;
-                renderFilteredRowsWithPagination();
+                displayOnlyFilteredRowsWithPagination();
                 renderPaginationButtons(); // Uppdatera knapparnas stil
             });
 
@@ -75,104 +65,137 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Funktion för att filtrera rader baserat på söktext.
-    //  Raderna döljs bara vid filtrering vilket möjliggör att alla rader kommer med i input-form även
-    //  fast dom är bortfiltrerade för tillfället.
+    // Funktion fÃ¶r att filtrera rader baserat pÃ¥ sÃ¶ktext.
+    //  Raderna dÃ¶ljs bara vid filtrering vilket mÃ¶jliggÃ¶r att alla rader kommer med i input-form Ã¤ven
+    //  fast dom Ã¤r bortfiltrerade fÃ¶r tillfÃ¤llet.
     function filterRowsBasedOnSearchInput() {
-        const query = searchInput.value.toLowerCase();
-        const rows = document.querySelectorAll("#productsBody tr");
+        const queryFromSearchInput = searchInput.value.toLowerCase();
+        const rowsInTable = document.querySelectorAll("#productsBody tr");
 
-        filteredRowIndexes = []; // Håller reda på vilka rader som ska visas
+        filteredRowIndexes = []; // HÃ¥ller reda pÃ¥ vilka rader som ska visas
 
-        rows.forEach((row, index) => {
-            const match = Array.from(row.cells).some(cell =>
-                cell.textContent.toLowerCase().includes(query)
+        rowsInTable.forEach((row, index) => {
+            const matchToTextContent = Array.from(row.cells).some(cell =>
+                cell.textContent.toLowerCase().includes(queryFromSearchInput)
             );
 
-            if (match) {
+            if (matchToTextContent) {
                 filteredRowIndexes.push(index);
             }
 
-            // Dölj alla rader initialt – visas senare av paginering
+            // DÃ¶lj alla rader initialt â€“ visas senare av paginering
             row.style.display = "none";
         });
 
         currentPage = 1;
-        renderFilteredRowsWithPagination();
+        displayOnlyFilteredRowsWithPagination();
         renderPaginationButtons();
     }
 
-    function renderFilteredRowsWithPagination() {
-        const rows = document.querySelectorAll("#productsBody tr");
+    function updateTableHeadSortArrows() {
+        const headersInTable = table.querySelectorAll("th[data-column]");
 
-        const start = (currentPage - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
+        headersInTable.forEach((th, index) => {
+            const label = th.getAttribute("data-label");
 
-        // Dölj alla först
-        rows.forEach(row => row.style.display = "none");
+            if (!label) return; // Hoppa Ã¶ver kolumner utan sortering
 
-        // Visa bara de filtrerade, i sorterad ordning
-        filteredRowIndexes.forEach((rowIndex, i) => {
-            if (i >= start && i < end) {
-                rows[rowIndex].style.display = "";
+            th.innerHTML = label; // Ã…terstÃ¤ll rubriken utan pil
+
+            // LÃ¤gg till pil pÃ¥ aktuell kolumn
+            if (index === currentSortedColumn.column) {
+                th.innerHTML += currentSortedColumn.ascending ? " &#9660;" : " &#9650;";//Pil ner och pil upp
             }
         });
     }
 
-    // Funktion för att sortera rader enligt angiven kolumn
+    // Funktion fÃ¶r att sortera rader enligt angiven kolumn
     function sortByColumn(index) {
+
+        //Kollar om den kolumn som just nu klickats Ã¤r samma som den som redan Ã¤r sorterad (currentSortedColumn.column).
+        //Om det Ã¤r samma kolumn, sÃ¥ vÃ¤xlar sorteringsordningen (t.ex. frÃ¥n stigande till fallande).
+        //Om det Ã¤r en ny kolumn, bÃ¶rjar sorteringen i stigande ordning.
+        //Resultatet sparas i ascending (en boolean).
         const ascending = currentSortedColumn.column === index ? !currentSortedColumn.ascending : true;
 
-        // Sortera filteredRowIndexes baserat på vald kolumn
+        // Sortera filteredRowIndexes baserat pÃ¥ vald kolumn
+        //Sorterar listan filteredRowIndexes, som innehÃ¥ller index till de rader som ska visas (d.v.s. efter ev. filtrering).
+        //a och b Ã¤r index till rader som ska jÃ¤mfÃ¶ras i sorteringen.
         filteredRowIndexes.sort((a, b) => {
-            const aText = allOriginalRows[a].cells[index].textContent.trim().toLowerCase();
-            const bText = allOriginalRows[b].cells[index].textContent.trim().toLowerCase();
 
-            const aNum = parseFloat(aText.replace(',', '.'));
-            const bNum = parseFloat(bText.replace(',', '.'));
+            //HÃ¤mtar textinnehÃ¥llet i cellen i kolumn index fÃ¶r respektive rad.
+            //.trim() tar bort mellanslag i bÃ¶rjan och slutet.
+            //.toLowerCase() gÃ¶r att jÃ¤mfÃ¶relsen blir skiftlÃ¤gesokÃ¤nslig (t.ex. "Apple" och "apple" behandlas lika).
+            //const aText = allOriginalRows[a].cells[index].textContent.trim().toLowerCase();
+            //const bText = allOriginalRows[b].cells[index].textContent.trim().toLowerCase();
+            const aTableCellText = allOriginalRows[a].cells[index].textContent.trim().toLowerCase();
+            const bTableCellText = allOriginalRows[b].cells[index].textContent.trim().toLowerCase();
 
-            if (!isNaN(aNum) && !isNaN(bNum)) {
-                return ascending ? aNum - bNum : bNum - aNum;
+            //FÃ¶rsÃ¶ker omvandla texten till ett numeriskt vÃ¤rde.
+            //ErsÃ¤tter , med . fÃ¶r att hantera t.ex. svenska decimaltal (t.ex. "3,14" â†’ "3.14").
+            //parseFloat konverterar till flyttal (decimaltal).
+            const aTryTextAsANumber = parseFloat(aTableCellText.replace(',', '.'));
+            const bTryTextAsANumber = parseFloat(bTableCellText.replace(',', '.'));
+
+            //Om bÃ¥da vÃ¤rdena kunde tolkas som tal.
+            const aIsNumber = /^\d+([.,]\d+)?$/.test(aTableCellText);
+            const bIsNumber = /^\d+([.,]\d+)?$/.test(bTableCellText);
+
+            if (aIsNumber && bIsNumber) {
+
+                //Sortera numeriskt.
+                //Om ascending Ã¤r true, sorteras i stigande ordning(aNum - bNum).
+                //Annars i fallande ordning.
+                return ascending ? aTryTextAsANumber - bTryTextAsANumber : bTryTextAsANumber - aTryTextAsANumber;
             }
 
-            return ascending ? aText.localeCompare(bText) : bText.localeCompare(aText);
+            //Om minst ett av vÃ¤rdena inte Ã¤r ett tal:
+            //Sortera alfabetiskt med localeCompare() (tar hÃ¤nsyn till sprÃ¥kliga regler).
+            //Sorteringsriktning beror pÃ¥ ascending.
+            return ascending ? aTableCellText.localeCompare(bTableCellText, 'sv') : bTableCellText.localeCompare(aTableCellText, 'sv');
         });
 
+        //Sparar information om vilken kolumn som nu Ã¤r sorterad, och i vilken riktning (stigande/fallande).
+        //AnvÃ¤nds fÃ¶r att veta hur nÃ¤sta klick ska hanteras.
         currentSortedColumn = { column: index, ascending };
 
-        updateHeaderSortArrows();
-        renderFilteredRowsWithPagination();
-        renderPaginationButtons();
-    }
-
-    function updateHeaderSortArrows() {
-        const headers = table.querySelectorAll("thead th");
-
-        headers.forEach((th, i) => {
-            // Ta bort gamla pilar
-            th.textContent = th.getAttribute("data-column");
-
-            // Lägg till pil på aktuell kolumn
-            if (i === currentSortedColumn.column) {
-                th.innerHTML += currentSortedColumn.ascending ? " &#9650;" : " &#9660;";//Pil upp och pil ner
-            }
+        // Flytta om rader i DOM enligt sorteringsresultat
+        const tbody = document.querySelector("tbody");
+        filteredRowIndexes.forEach(index => {
+            tbody.appendChild(allOriginalRows[index]);
         });
+
+        displayOnlyFilteredRowsWithPagination();
+        renderPaginationButtons();
+        updateTableHeadSortArrows();
     }
 
-    // Lägg till klickhändelser på tabellhuvuden för att möjliggöra sortering
-    const headers = table.querySelectorAll("thead th");
-    headers.forEach((th, index) => {
-        th.style.cursor = "pointer"; // Ändra muspekaren till pekande hand
+    // HÃ¤ndelse fÃ¶r sÃ¶kfÃ¤ltet sÃ¥ att det filtrerar medan man skriver
+    searchInput.addEventListener("input", filterRowsBasedOnSearchInput);
+
+    // KlickhÃ¤ndelser pÃ¥ tabellhuvuden fÃ¶r att mÃ¶jliggÃ¶ra sortering
+    const tableColumnHeaders = table.querySelectorAll("thead th");
+    tableColumnHeaders.forEach((th, index) => {
+        th.style.cursor = "pointer"; // Ã„ndra muspekaren till pekande hand
         th.addEventListener("click", () => sortByColumn(index)); // Sortera efter vald kolumn
     });
 
-    // Lägg till händelse för sökfältet så att det filtrerar medan man skriver
-    searchInput.addEventListener("input", filterRowsBasedOnSearchInput);
+    // KlickhÃ¤ndelser pÃ¥ varje cell fÃ¶r att navigera till produktdetaljer
+    document.querySelectorAll("#productsTable td[data-product-id]").forEach(cell => {
+        cell.addEventListener("click", (event) => {
 
-    // Initiera första renderingen av tabellen
-    renderTableRows();
+            // event.stopPropagation() â€“ FÃ¶rhindrar att klick hÃ¤ndelsen bubblar upp och
+            // pÃ¥verkar andra element(som form eller andra klickbara saker).
+            event.stopPropagation();
 
+            const productId = cell.getAttribute("data-product-id");
+            if (productId) {
+                window.location.href = `SpecificProductDetails?id=${productId}`;
+            }
+        });
+    });
 
-
+    displayOnlyFilteredRowsWithPagination();
+    renderPaginationButtons();
 });
 

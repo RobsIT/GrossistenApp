@@ -15,7 +15,7 @@ namespace GrossistenApp.Pages
         }
         [BindProperty]
         public Product ProductObject { get; set; }
-        //L‰gg till ProductsFromDbList som null-s‰kert i modellen " = new() "
+        //L√§gg till ProductsFromDbList som null-s√§kert i modellen " = new() "
         public List<Product> ProductsFromDbList { get; set; } = new(); // null-safe
         public List<Product> StockOverviwProductsFromDbList { get; set; }
         public async Task OnGetAsync()
@@ -30,11 +30,11 @@ namespace GrossistenApp.Pages
             {
                 allProductsFromDbList = new List<Product>
                 {
-                    new Product { Title = "Kunde inte h‰mta information, testa igen senare(Starta Api).", ShowInStock = true}
+                    new Product { Title = "Kunde inte h√§mta information, testa igen senare(Starta Api).", ShowInStock = true}
                 };
             }
 
-            StockOverviwProductsFromDbList = allProductsFromDbList.Where(p => p.ShowInStock ?? false).ToList();
+            StockOverviwProductsFromDbList = AllProductsFromDbList.Where(p => p.ShowInStock ?? false).OrderByDescending(p => p.Id).ToList();
 
         }
     }

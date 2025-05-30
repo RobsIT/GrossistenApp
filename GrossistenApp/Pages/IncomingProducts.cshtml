@@ -100,13 +100,13 @@
             <table id="productsTable">
                 <thead>
                     <tr>
-                        <th data-column="ArticleNumber">Artikelnummer</th>
-                        <th data-column="Title">Titel</th>
-                        <th data-column="Description">Beskrivning</th>
-                        <th data-column="Size">Storlek</th>
-                        <th data-column="Price">Pris</th>
-                        <th data-column="Category">Kategori</th>
-                        <th data-column="Quantity">Antal i lager</th>
+                        <th data-column="ArticleNumber" data-label="Artikelnummer">Artikelnummer</th>
+                        <th data-column="Title" data-label="Titel">Titel</th>
+                        <th data-column="Description" data-label="Beskrivning">Beskrivning</th>
+                        <th data-column="Size" data-label="Storlek">Storlek</th>
+                        <th data-column="Price" data-label="Pris">Pris</th>
+                        <th data-column="Category" data-label="Kategori">Kategori</th>
+                        <th data-column="Quantity" data-label="Antal">Antal i lager</th>
                         <th>Lägg till antal</th>
                     </tr>
                 </thead>
@@ -114,8 +114,6 @@
                     @for (int i = 0; i < Model.IncomingProductsFromDbList.Count; i++)
                     {
                         var product = Model.IncomingProductsFromDbList[i];
-                       
-                        //FIXA SORTERING I BACKEND!!!!!!!!!!!!!!!!!!!!!!!!!
 
                             // data-product-id ger varje cell ett id.
                             // När man klickar på en cell skickar JS-koden id till OnGet id-inparameter.
@@ -125,7 +123,7 @@
                                 <td data-product-id="@product.Id">@product.Title</td>
                                 <td data-product-id="@product.Id">@product.Description</td>
                                 <td data-product-id="@product.Id">@product.Size</td>
-                                <td data-product-id="@product.Id">@product.Price kr</td>
+                                <td data-product-id="@product.Id">@product.Price</td>
                                 <td data-product-id="@product.Id">@product.Category</td>
                                 <td>@product.Quantity</td>
                                 <td>
@@ -154,7 +152,7 @@
     @if (Model.IncomingReceiptsFromDbList != null)
     {
         @using System.Linq
-        @foreach (var receipt in Model.IncomingReceiptsFromDbList.OrderByDescending(r => r.DateAndTimeCreated))
+        @foreach (var receipt in Model.IncomingReceiptsFromDbList)
         {
 
             //FIXA SORTERING I BACKEND!!!!!!!!!!!!!!!!!!!!!!!!!
