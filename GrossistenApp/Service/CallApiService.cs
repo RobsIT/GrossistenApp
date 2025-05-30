@@ -2,7 +2,15 @@
 
 namespace GrossistenApp.Service
 {
-    public class CallApiService
+    public interface ICallApiService
+    {
+        Task<T> GetDataFromApi<T>(string url);
+        Task<HttpResponseMessage> CreateItem<T>(string url, T newItem);
+        Task<HttpResponseMessage> EditItem<T>(string url, T updatedItem);
+        Task<HttpResponseMessage> DeleteItem(string url);
+    }
+
+    public class CallApiService : ICallApiService
     {
         private readonly IHttpClientFactory _httpClientFactory;
 
