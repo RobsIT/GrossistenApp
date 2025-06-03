@@ -90,38 +90,54 @@
     <form method="post" asp-page-handler="Update">
         <input type="hidden" asp-for="@Model.UpdateSpecificProductDetails.Id" />
         <div class="form-floating mb-2">
-            <input asp-for="UpdateSpecificProductDetails.ArticleNumber"  class="form-control" placeholder="" />
-            <label asp-for="UpdateSpecificProductDetails.ArticleNumber">Artikel</label>
+            <input asp-for="UpdateSpecificProductDetails.ArticleNumber" class="form-control" placeholder="ArtikelNummer"
+                   maxlength="20" pattern="[A-Za-z0-9]+" title="(tip)Endast bokstäver och siffror" />
+            <label asp-for="UpdateSpecificProductDetails.ArticleNumber" class="control-label">Artikel</label>
+            <span asp-validation-for="UpdateSpecificProductDetails.ArticleNumber" class="text-danger"></span>
         </div>
 
         <div class="form-floating mb-2">
-            <input asp-for="UpdateSpecificProductDetails.Title"  class="form-control" placeholder="" />
-            <label asp-for="UpdateSpecificProductDetails.Title">Titel</label>
+            <input asp-for="UpdateSpecificProductDetails.Title" class="form-control" placeholder="Titel" maxlength="20" />
+            <label asp-for="UpdateSpecificProductDetails.Title" class="control-label">Titel</label>
+            <span asp-validation-for="UpdateSpecificProductDetails.Title" class="text-danger"></span>
+
         </div>
 
         <div class="form-floating mb-2">
-            <input asp-for="UpdateSpecificProductDetails.Description"  class="form-control" placeholder="" />
-            <label asp-for="UpdateSpecificProductDetails.Description">Beskrivning</label>
+            <input asp-for="UpdateSpecificProductDetails.Description" class="form-control" placeholder="Beskrivning" maxlength="30" />
+            <label asp-for="UpdateSpecificProductDetails.Description" class="control-label">Beskrivning</label>
+            <span asp-validation-for="UpdateSpecificProductDetails.Description" class="text-danger"></span>
+
         </div>
 
         <div class="form-floating mb-2">
-            <input asp-for="UpdateSpecificProductDetails.Size"  class="form-control" placeholder="" />
-            <label asp-for="UpdateSpecificProductDetails.Size">Storlek</label>
+            <input asp-for="UpdateSpecificProductDetails.Size" class="form-control" placeholder="Storlek" maxlength="20" />
+            <label asp-for="UpdateSpecificProductDetails.Size" class="control-label">Storlek</label>
+            <span asp-validation-for="UpdateSpecificProductDetails.Size" class="text-danger"></span>
+
         </div>
 
         <div class="form-floating mb-2">
-            <input asp-for="UpdateSpecificProductDetails.Price"  class="form-control" placeholder="" />
-            <label asp-for="UpdateSpecificProductDetails.Price">Pris</label>
+            <input asp-for="UpdateSpecificProductDetails.Price" class="form-control" placeholder="Pris" />
+            <label asp-for="UpdateSpecificProductDetails.Price" class="control-label">Pris</label>
+            <span asp-validation-for="UpdateSpecificProductDetails.Price" class="text-danger"></span>
+
         </div>
 
         <div class="form-floating mb-2">
-            <input asp-for="UpdateSpecificProductDetails.Category"  class="form-control" placeholder="" />
-            <label asp-for="UpdateSpecificProductDetails.Category">Kategori</label>
+            <input asp-for="UpdateSpecificProductDetails.Category" class="form-control" placeholder="Kategori" 
+                    maxlength="20" pattern="[A-Za-zåäöÅÄÖ\s]+" title="Endast bokstäver" />
+            <label asp-for="UpdateSpecificProductDetails.Category" class="control-label">Kategori</label>
+            <span asp-validation-for="UpdateSpecificProductDetails.Category" class="text-danger"></span>
+
         </div> 
         
         <div class="form-floating mb-2">
-            <input asp-for="UpdateSpecificProductDetails.Quantity"  class="form-control" placeholder="" />
-            <label asp-for="UpdateSpecificProductDetails.Quantity">Antal</label>
+            <input asp-for="UpdateSpecificProductDetails.Quantity" class="form-control" placeholder="Antal" 
+                    type="number" step="0.01" min="0" max="10000"/>
+            <label asp-for="UpdateSpecificProductDetails.Quantity" class="control-label">Antal</label>
+            <span asp-validation-for="UpdateSpecificProductDetails.Quantity" class="text-danger"></span>
+
         </div>
 
         <div class="text-center">

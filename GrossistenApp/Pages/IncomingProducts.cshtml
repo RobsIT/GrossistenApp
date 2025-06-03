@@ -4,59 +4,11 @@
     ViewData["Title"] = "Inköp";
 }
 
-
-@*----------- SKAPA PRODUKT --------------------------------------*@
-<div id="editForm" style="display: none;" class="bigCard mt-4">
-    <div class="createProductForm">
-
-        <h2>Skapa Produkt</h2>
-        <p>Lägger till produkt i Beställnings-listan</p>
-        <form method="post" asp-page-handler="CreateProduct">
-            <div class="form-floating mb-2">
-                <input asp-for="ProductObject.ArticleNumber" class="form-control" placeholder="ArtikelNummer" />
-                <label asp-for="ProductObject.ArticleNumber" class="control-label">Artikel</label>
-                <span  class="text-danger"></span>
-            </div>
-            
-            <div class="form-floating mb-2">
-                <input asp-for="ProductObject.Title" class="form-control" placeholder="Titel" />
-                <label asp-for="ProductObject.Title" class="control-label">Titel</label>
-                <span class="text-danger"></span>
-            </div>
-            
-            <div class="form-floating mb-2">
-                <input asp-for="ProductObject.Description" class="form-control" placeholder="Beskrivning" />
-                <label asp-for="ProductObject.Description" class="control-label">Beskrivning</label>
-                <span class="text-danger"></span>
-            </div>
-            
-            <div class="form-floating mb-2">
-                <input asp-for="ProductObject.Size" class="form-control" placeholder="Storlek" />
-                <label asp-for="ProductObject.Size" class="control-label">Storlek</label>
-                <span class="text-danger"></span>
-            </div>
-          
-            <div class="form-floating mb-2">
-                <input asp-for="ProductObject.Price" class="form-control" placeholder="Pris" />
-                <label asp-for="ProductObject.Price" class="control-label">Pris</label>
-                <span class="text-danger"></span>
-            </div>
-            
-            <div class="form-floating mb-2">
-                <input asp-for="ProductObject.Category" class="form-control" placeholder="Kategori" />
-                <label asp-for="ProductObject.Category" class="control-label">Kategori</label>
-                <span class="text-danger"></span>
-            </div>
-           
-            <div class="form-group text-center">
-                <button type="submit" class="btn btn-primary w-50 m-2">Skapa</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-@* Open and close create-form button*@
 @section Scripts {
+    @* Laddar JavaScript för att göra asp-validation-for och valideringsattribut funktionella i browsern *@
+    <partial name="_ValidationScriptsPartial" />
+
+    @* Open and close create-form button*@
     <script>
         const editButton = document.getElementById("openFormBtn");
         const form = document.getElementById("editForm");
@@ -72,6 +24,59 @@
         });
     </script>
 }
+
+@*----------- SKAPA PRODUKT --------------------------------------*@
+<div id="editForm" style="display: none;" class="bigCard mt-4">
+    <div class="createProductForm">
+
+        <h2>Skapa Produkt</h2>
+        <p>Lägger till produkt i Beställnings-listan</p>
+        <form method="post" asp-page-handler="CreateProduct">
+            <div class="form-floating mb-2">
+                <input asp-for="ProductObject.ArticleNumber" class="form-control" placeholder="ArtikelNummer"
+                       maxlength="20" pattern="[A-Za-z0-9]+" title="(tip)Endast bokstäver och siffror" />
+                <label asp-for="ProductObject.ArticleNumber" class="control-label">Artikel</label>
+                <span asp-validation-for="ProductObject.ArticleNumber" class="text-danger"></span>
+            </div>
+            
+            <div class="form-floating mb-2">
+                <input asp-for="ProductObject.Title" class="form-control" placeholder="Titel" maxlength="20" />
+                <label asp-for="ProductObject.Title" class="control-label">Titel</label>
+                <span asp-validation-for="ProductObject.Title" class="text-danger"></span>
+            </div>
+            
+            <div class="form-floating mb-2">
+                <input asp-for="ProductObject.Description" class="form-control" placeholder="Beskrivning" maxlength="30" />
+                <label asp-for="ProductObject.Description" class="control-label">Beskrivning</label>
+                <span asp-validation-for="ProductObject.Description" class="text-danger"></span>
+            </div>
+            
+            <div class="form-floating mb-2">
+                <input asp-for="ProductObject.Size" class="form-control" placeholder="Storlek" maxlength="20" />
+                <label asp-for="ProductObject.Size" class="control-label">Storlek</label>
+                <span asp-validation-for="ProductObject.Size" class="text-danger"></span>
+            </div>
+          
+            <div class="form-floating mb-2">
+                <input asp-for="ProductObject.Price" class="form-control" placeholder="Pris"
+                       type="number" step="0.01" min="0" max="100000" />
+                <label asp-for="ProductObject.Price" class="control-label">Pris</label>
+                <span asp-validation-for="ProductObject.Price" class="text-danger"></span>
+            </div>
+            
+            <div class="form-floating mb-2">
+                <input asp-for="ProductObject.Category" class="form-control" placeholder="Kategori"
+                       maxlength="20" pattern="[A-Za-zåäöÅÄÖ\s]+" title="Endast bokstäver" />
+                <label asp-for="ProductObject.Category" class="control-label">Kategori</label>
+                <span asp-validation-for="ProductObject.Category" class="text-danger"></span>
+            </div>
+           
+            <div class="form-group text-center">
+                <button type="submit" class="btn btn-primary w-50 m-2">Skapa</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 @* ------------- BESTÄLLNINGSBARA PRODUKTER ------------------------------------*@
 <div class="bigCard">
@@ -154,41 +159,37 @@
         @using System.Linq
         @foreach (var receipt in Model.IncomingReceiptsFromDbList)
         {
-
-            //FIXA SORTERING I BACKEND!!!!!!!!!!!!!!!!!!!!!!!!!
-            if (true)
-            {
                 
-                <div class="receiptCard">
-                    <p>Kvitto / @receipt.WorkerName / @receipt.DateAndTimeCreated</p>
-                        <table class="receiptTable">
-                            <thead>
-                                <tr>
-                                    <th>Artikel</th>
-                                    <th>Titel</th>
-                                    <th>Storlek</th>
-                                    <th>Pris</th>
-                                    <th>Antal</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var productFromDb in Model.ProductsFromDbListOnReceipt)
+            <div class="receiptCard">
+                <p>Kvitto / @receipt.WorkerName / @receipt.DateAndTimeCreated</p>
+                    <table class="receiptTable">
+                        <thead>
+                            <tr>
+                                <th>Artikel</th>
+                                <th>Titel</th>
+                                <th>Storlek</th>
+                                <th>Pris</th>
+                                <th>Antal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var productFromDb in Model.ProductsFromDbListOnReceipt)
+                            {
+                                if(receipt.Id == productFromDb.ReceiptId)
                                 {
-                                    if(receipt.Id == productFromDb.ReceiptId)
-                                    {
-                                        <tr>
-                                            <td>@productFromDb.ArticleNumber</td>
-                                            <td>@productFromDb.Title</td>
-                                            <td>@productFromDb.Size</td>
-                                            <td>@productFromDb.Price</td>
-                                            <td>@productFromDb.Quantity</td>
-                                        </tr>
-                                    }
+                                    <tr>
+                                        <td>@productFromDb.ArticleNumber</td>
+                                        <td>@productFromDb.Title</td>
+                                        <td>@productFromDb.Size</td>
+                                        <td>@productFromDb.Price</td>
+                                        <td>@productFromDb.Quantity</td>
+                                    </tr>
                                 }
-                            </tbody>
-                        </table>
-                </div>
-            }
+                            }
+                        </tbody>
+                    </table>
+            </div>
+            
         }
     }
     
