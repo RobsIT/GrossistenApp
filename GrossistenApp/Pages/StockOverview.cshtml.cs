@@ -34,7 +34,7 @@ namespace GrossistenApp.Pages
                 };
             }
 
-            StockOverviwProductsFromDbList = AllProductsFromDbList.Where(p => p.ShowInStock ?? false).OrderByDescending(p => p.Id).ToList();
+            StockOverviwProductsFromDbList = allProductsFromDbList.Where(p => p.ShowInStock ?? false).OrderByDescending(p => p.Id).ToList();
 
         }
     }

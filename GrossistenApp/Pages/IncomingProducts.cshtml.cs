@@ -101,7 +101,7 @@ namespace GrossistenApp.Pages
            await _callApiService.EditItem("Product/bulk", allProductsFromDb);
 
             //-------Create Receipt---------------   
-            ReceiptObject.WorkerName = "Svenne";
+            ReceiptObject.WorkerName = "Lasse";
             ReceiptObject.showAsIncomingReceipt = true;
             ReceiptObject.showAsOutgoingReceipt = false;
             ReceiptObject.DateAndTimeCreated = DateTime.Now;
