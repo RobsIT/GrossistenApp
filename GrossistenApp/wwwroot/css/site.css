@@ -34,7 +34,7 @@ body {
     text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
 }
 
-/* För att ta bort hover-effekt */
+/* To get rid of hover-effekt */
 .navbar-brandLogo:hover {
     color: rgb(255, 243, 17); 
     text-decoration: none;
@@ -130,31 +130,26 @@ h2 {
     width: 50%;
     hight: auto;
 }
-/*FUNKAR INTE FIXA*/
+
 .receiptTable table {
     border: none;
     margin: 0px;
     background-color: white;
     padding-right: 7px;
     width: 100%;
-    /*text-align: left;*/
 }
-/*FUNKAR INTE FIXA*/
+
 .receiptTable th {
     border: none;
     margin: 0px;
     background-color: white;
     padding-right: 7px;
-    /* width: 100%;*/
-    /*text-align: left;*/
 }
-/*FUNKAR INTE FIXA*/
+
 .receiptTable td {
     border: none;
     margin: 0px;
     background-color: white;
     padding-right: 7px;
-    /* width: 100%;*/
-    /*text-align: left;*/
 }
 

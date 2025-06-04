@@ -5,7 +5,7 @@
 }
 
 @section Scripts {
-    @* Laddar JavaScript för att göra asp-validation-for och valideringsattribut funktionella i browsern *@
+   
     <partial name="_ValidationScriptsPartial" />
 
     @* Open and close create-form button*@
@@ -25,7 +25,7 @@
     </script>
 }
 
-@*----------- SKAPA PRODUKT --------------------------------------*@
+@*----------- CREATE PRODUCT --------------------------------------*@
 <div id="editForm" style="display: none;" class="bigCard mt-4">
     <div class="createProductForm">
 
@@ -78,7 +78,7 @@
     </div>
 </div>
 
-@* ------------- BESTÄLLNINGSBARA PRODUKTER ------------------------------------*@
+@* ------------- ORDERABLE PRODUCTS ------------------------------------*@
 <div class="bigCard">
    
     <div class="d-flex justify-content-between">
@@ -120,9 +120,6 @@
                     {
                         var product = Model.IncomingProductsFromDbList[i];
 
-                            // data-product-id ger varje cell ett id.
-                            // När man klickar på en cell skickar JS-koden id till OnGet id-inparameter.
-                            // Vi vill inte ha på Quantity för då hoppar vi in på specific-sidan när man ökar i inputen. 
                             <tr>
                                 <td data-product-id="@product.Id">@product.ArticleNumber</td>
                                 <td data-product-id="@product.Id">@product.Title</td>
@@ -150,7 +147,7 @@
     
 </div>
 
-@*-------------------INKÖPSKVITTON------------------------------------ *@
+@*------------------- INCOMING RECEIPTS ------------------------------------ *@
  <div class="bigCard">
     <h2>Mottagningskvitton</h2>
 

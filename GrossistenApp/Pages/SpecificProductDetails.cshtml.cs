@@ -16,8 +16,10 @@ namespace GrossistenApp.Pages
         }
         
         public Product SpecificProductDetails { get; set; }
+       
         [BindProperty]
         public Product UpdateSpecificProductDetails { get; set; }
+        
         [BindProperty]
         public Product DeleteSpecificProductObject { get; set; }
 
@@ -48,7 +50,6 @@ namespace GrossistenApp.Pages
                 return NotFound();
             }
 
-            // Uppdatera fälten från det inbundna objektet
             productToUpdate.ArticleNumber = UpdateSpecificProductDetails.ArticleNumber;
             productToUpdate.Title = UpdateSpecificProductDetails.Title;
             productToUpdate.Description = UpdateSpecificProductDetails.Description;
@@ -57,9 +58,9 @@ namespace GrossistenApp.Pages
             productToUpdate.Category = UpdateSpecificProductDetails.Category;
             productToUpdate.Quantity = UpdateSpecificProductDetails.Quantity;
 
-
             await _callApiService.EditItem($"Product/{productToUpdate.Id}", productToUpdate);
-            // Påminner om vilken SpecificProductDetails man är på efter uppdateringen  new { id = UpdateSpecificProductDetails.Id }
+            
+            //Reminds which SpecificProductDetails you were at before update - new { id = UpdateSpecificProductDetails.Id }
             return RedirectToPage("./SpecificProductDetails", new { id = UpdateSpecificProductDetails.Id });
         }
 
