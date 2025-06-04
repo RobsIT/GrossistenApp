@@ -13,12 +13,14 @@ namespace GrossistenApp.Pages
         {
             _callApiService = callApiService;
         }
+        
         [BindProperty]
         public Product ProductObject { get; set; }
        
         public List<Product> IncomingProductsFromDbList { get; set; }
 
         public List<Product> ProductsFromDbListOnReceipt{ get; set; }
+       
         [BindProperty]
         public List<ProductInputViewModel> ProductsToAddFromInput { get; set; }
        
@@ -80,7 +82,7 @@ namespace GrossistenApp.Pages
 
             var allProductsFromDb = await _callApiService.GetDataFromApi<List<Product>>("Product");
 
-            //----Öka antal från Beställningsbara Produkter formuläret på befintlig produkt------
+            //Increase quantity from the Orderable Products form for the choosen products
             foreach (var inputObject in ProductsToAddFromInput)
             {
                 if (inputObject.QuantityToAdd > 0)
@@ -91,7 +93,7 @@ namespace GrossistenApp.Pages
                         
                         specificProduct.Quantity = specificProduct.Quantity + inputObject.QuantityToAdd;
 
-                        // Uppdatera showInStock boolen om lagret är mer än antal 0. Sql-Db läser true/faulse som 1/0.
+                        //Update the showInStock boolean if stock is greater than 0. SQL DB reads true/false as 1/0
                         specificProduct.ShowInStock = specificProduct.Quantity > 0;
                     }
                 
@@ -108,7 +110,7 @@ namespace GrossistenApp.Pages
 
             await _callApiService.CreateItem("Receipt", ReceiptObject);
 
-            //Lägg till dom ökade Produkterna till kvittot
+            //Add the increased products to the receipt
             var receipts = await _callApiService.GetDataFromApi<List<Receipt>>("Receipt");
             int highestReceiptIdInDb = receipts.Max(r => r.Id);
 
@@ -118,10 +120,9 @@ namespace GrossistenApp.Pages
                 if (inputObject.QuantityToAdd > 0)
                 {
 
-                    //Hämtar produkten som motsvarar Id:t i ProductsToAddFromInput-listan.
                     var choosenProductToAdd = allProductsFromDb.FirstOrDefault(p => p.Id == inputObject.ProductId);
 
-                    ProductObject.Id = 0;//VIKTIGT med 0 för att databasen ska hantera Id.
+                    ProductObject.Id = 0;//IMPORTANT to use 0 for the database to handle the ID correctly
                     ProductObject.ArticleNumber = choosenProductToAdd.ArticleNumber;
                     ProductObject.Title = choosenProductToAdd.Title;
                     ProductObject.Description = choosenProductToAdd.Description;

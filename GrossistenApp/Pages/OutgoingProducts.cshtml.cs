@@ -14,19 +14,21 @@ namespace GrossistenApp.Pages
         {
             _callApiService = callApiService;
         }
+       
         [BindProperty]
         public Product ProductObject { get; set; }
 
         public List<Product> ProductsFromDbList { get; set; }
         public List<Product> OutgoingProductsFromDbList { get; set; }
         public List<Product> ProductsFromDbListOnReceipt { get; set; }
+        
         [BindProperty]
         public List<ProductInputViewModel> ProductsToAddFromInput { get; set; }
 
         public List<Receipt> OutgoingReceiptsFromDbList { get; set; }
+        
         [BindProperty]
         public Receipt ReceiptObject { get; set; }
-
 
         public async Task OnGetAsync()
         {
@@ -43,9 +45,9 @@ namespace GrossistenApp.Pages
                     new Product { Title = "Kunde inte hämta information, testa igen senare(Starta Api).", ShowInStock = true}
                 };
             }
+            
             OutgoingProductsFromDbList = allProductsFromDbList.Where(p => p.ShowInStock ?? false).OrderByDescending(p => p.Id).ToList();
             ProductsFromDbListOnReceipt = allProductsFromDbList.Where(p => p.ShowOnReceipt ?? false).ToList();
-
 
             List<Receipt> allReceiptsFromDbList;
 
@@ -71,7 +73,6 @@ namespace GrossistenApp.Pages
             var successfullyProcessedInputs = new List<ProductInputViewModel>();
             
             // Update quantities for products that have additions
-            
             foreach (var product in ProductsToAddFromInput)
             {
                 var specificProduct = allProductsFromDb.FirstOrDefault(p => p.Id == product.ProductId);

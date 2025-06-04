@@ -4,7 +4,7 @@
     ViewData["Title"] = "Utleverans";
 }
 
-@* ------------- LEVERANSBARA PRODUKTER ------------------------------------*@
+@* ------------- ORDERABLE PRODUCTS ------------------------------------*@
 <div class="bigCard">
 
     <h2>Leveransbara Produkter</h2>
@@ -33,9 +33,6 @@
                     {
                         var product = Model.OutgoingProductsFromDbList[i];
 
-                            // data-product-id ger varje cell ett id.
-                            // När man klickar på en cell skickar JS-koden id till OnGet id-inparameter.
-                            // Vi vill inte ha på Quantity för då hoppar vi in på specific-sidan när man ökar i inputen.
                             <tr>
                                 <td data-product-id="@product.Id">@product.ArticleNumber</td>
                                 <td data-product-id="@product.Id">@product.Title</td>
@@ -63,7 +60,7 @@
 
 </div>
 
-@*-------------------LEVERANSKVITTON------------------------------------ *@
+@*------------------- OUTGOING RECEIPTS ------------------------------------ *@
 <div class="bigCard">
     <h2>Leveranskvitton</h2>
 

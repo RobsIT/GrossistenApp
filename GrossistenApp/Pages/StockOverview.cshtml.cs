@@ -13,9 +13,9 @@ namespace GrossistenApp.Pages
         {
             _callApiService = callApiService;
         }
+       
         [BindProperty]
         public Product ProductObject { get; set; }
-        //Lägg till ProductsFromDbList som null-säkert i modellen " = new() "
         public List<Product> ProductsFromDbList { get; set; } = new(); // null-safe
         public List<Product> StockOverviwProductsFromDbList { get; set; }
         public async Task OnGetAsync()
